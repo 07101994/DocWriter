@@ -31,9 +31,17 @@ class X {
 		if (args.Length > 0)
 			path = args [0];
 		int col = 0;
-		string start = "MonoNativeFunctionWrapperAttribute.xml";
+		string start = "AVPlayer.xml";
 		bool started = false;
-
+#if debug || truex
+		var e = XDocument.Load ("/tmp/fox1");
+		var he = Convert (e.Root);
+		var xe = ToXml (he).ToArray ();
+		Console.WriteLine (e.ToString ());
+		foreach (var x in xe)
+			Console.Write (x.ToString ());
+		Console.WriteLine ();
+#endif
 
 		foreach (var dir in Directory.GetDirectories (path)) {
 			foreach (var file in Directory.GetFiles (dir, "*.xml")){
@@ -74,6 +82,8 @@ class X {
 	{
 		var elements = d.XPathSelectElements (path);
 		foreach (var element in elements) { 
+			var str = element.ToString ();
+			//Console.WriteLine (str);
 			var html = Convert (element);
 			var ret = ToXml (html);
 
@@ -81,27 +91,27 @@ class X {
 			foreach (var c in element.Nodes ()) {
 				sb.Append (c.ToString ());
 			}
-			var estr = sb.ToString ();
+			var expected = sb.ToString ();
 			//estr = estr.Replace (" />", "/>");
 			sb.Clear ();
 			foreach (var c in ret) {
 				sb.Append (c.ToString ());
 			}
-			var rstr = sb.ToString ();
+			var result = sb.ToString ();
 
-			if (estr != rstr) {
+			if (expected != result) {
 				var diff = new XmlDiff (XmlDiffOptions.IgnoreWhitespace);
-				var expected = new XmlTextReader (new StringReader ("<group>" + estr + "</group>"));
-				var result = new XmlTextReader (new StringReader ("<group>" + rstr + "</group>"));
+				var xexpected = new XmlTextReader (new StringReader ("<group>" + expected + "</group>"));
+				var xresult = new XmlTextReader (new StringReader ("<group>" + result + "</group>"));
 			
-				var r = diff.Compare (expected, result, new XmlTextWriter (Console.Out));
+				var equal = diff.Compare (xexpected, xresult, new XmlTextWriter (Console.Out));
 
 
-				if (estr != rstr) {
+				if (!equal && expected != result) {
 					bool found = false;
-					for (int i = 0; i < estr.Length && i < rstr.Length; i++) {
-						if (estr [i] != rstr [i]) {
-							Report (estr, rstr, i);
+					for (int i = 0; i < expected.Length && i < result.Length; i++) {
+						if (expected [i] != result [i]) {
+							Report (expected, result, i);
 							html = Convert (element);
 							ret = ToXml (html);
 							found = true;
@@ -109,7 +119,7 @@ class X {
 						}
 					}
 					if (!found)
-						Report (estr, rstr, Math.Min (estr.Length, rstr.Length));
+						Report (expected, result, Math.Min (expected.Length, result.Length));
 				}
 			}
 		}
@@ -145,7 +155,8 @@ class X {
 			case "p":
 				if (element.OuterHtml == "<p/>")
 					yield return new XElement ("para");
-				yield return ParseP (element);
+				else
+					yield return ParseP (element);
 				break;
 			case "div":
 				foreach (var div in ParseDiv (element))
@@ -197,7 +208,7 @@ class X {
 		var list = new XElement ("list", new XAttribute ("type", kind));
 
 		foreach (var li in node.Elements ("li")) {
-			list.Add (new XElement ("item"), new XElement ("term", ParseRoot (li)));
+			list.Add (new XElement ("item", new XElement ("term", ParseRoot (li))));
 		}
 		return list;
 	}
@@ -212,16 +223,12 @@ class X {
 		var list = new XElement ("list", new XAttribute ("type", "table"), new XElement ("listheader", term, desc));
 
 		int tr = 0;
-		foreach (var child in node.ChildNodes){
-			if (child is HtmlNode && child.Name == "tr"){
-				tr++;
-				if (tr == 1)
-					continue;
-				var tds = child.SelectNodes ("td");
-				term = new XElement ("term", ParseRoot (tds [0]));
-				desc = new XElement ("description", ParseRoot (tds[1]));
-				list.Add (new XElement ("item", term, desc));
-			}
+		foreach (var child in node.SelectNodes ("tr").Skip (1)){
+
+			var tds = child.SelectNodes ("td");
+			term = new XElement ("term", ParseRoot (tds [0]));
+			desc = new XElement ("description", ParseRoot (tds[1]));
+			list.Add (new XElement ("item", term, desc));
 		}
 
 		return list;
@@ -331,7 +338,7 @@ class X {
 			yield return format;
 		} else if (dclass.StartsWith ("block")) {
 			var kind = dclass.Substring (6);
-			var block = new XElement ("block", new XAttribute ("type", kind));
+			var block = new XElement ("block", new XAttribute ("subset", "none"), new XAttribute ("type", kind));
 			foreach (var child in ParseRoot (node))
 				block.Add (child);
 			yield return block;
@@ -360,6 +367,7 @@ class X {
 		bool seenPara = false;
 		bool first = true;
 		bool renderedText = false;
+		int nodeCount = root.Nodes ().Count ();
 		foreach (var node in root.Nodes ()) {
 			if (node is XText){
 				if (first) {
@@ -370,7 +378,9 @@ class X {
 					renderedText = true;
 				} else if (seenPara && currentFile.IndexOf ("MonoTouch.Dialog") == -1)
 					WarningDangling (root, node);
-				break;
+				else
+					sb.AppendFormat ("{0}", ((node as XText).Value));
+				continue;
 			}
 			first = false;
 

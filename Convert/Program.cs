@@ -33,7 +33,7 @@ class X {
 		int col = 0;
 		string start = "AVPlayer.xml";
 		bool started = false;
-#if debug || truex
+#if debug || true
 		var e = XDocument.Load ("/tmp/fox1");
 		var he = Convert (e.Root);
 		var xe = ToXml (he).ToArray ();
@@ -272,7 +272,7 @@ class X {
 					var kind = child.Attributes ["class"].Value;
 					switch (kind) {
 					case "code":
-						xp.Add (new XElement ("c", new XText (child.InnerText)));
+						xp.Add (new XElement ("c", new XText (HttpUtility.HtmlDecode (child.InnerText))));
 						break;
 					case "langword":
 						xp.Add (new XElement ("see", new XAttribute ("langword", child.InnerHtml)));
@@ -373,14 +373,19 @@ class X {
 				if (first) {
 					if (root.IsEmpty)
 						sb.Append ("<p/>");
-					else
-						sb.AppendFormat ("{0}", RenderPara (root.Nodes ()));
+					else {
+						// Should we really RenderPara here?   Should we not just add the text, and continue?
+						// The warning should just be about a para started if we had text initially:
+						// IMPORTANT: If you uncomment the next line, change the "continue" for a "break"
+						//sb.AppendFormat ("{0}", RenderPara (root.Nodes ()));
+						sb.Append ((node as XText).Value);
+					}
 					renderedText = true;
 				} else if (seenPara && currentFile.IndexOf ("MonoTouch.Dialog") == -1)
 					WarningDangling (root, node);
-				else
+				else 
 					sb.AppendFormat ("{0}", ((node as XText).Value));
-				continue;
+				continue; // break
 			}
 			first = false;
 
@@ -436,6 +441,9 @@ class X {
 					break;
 				case "paramref":
 					sb.Append (RenderParamRef (el));
+					break;
+				case "typeparamref":
+					sb.Append (RenderTypeParamRef (el));
 					break;
 				case "c":
 					sb.AppendFormat ("<code class='code'>{0}</code>", el.Value);
@@ -540,7 +548,7 @@ class X {
 				} else if (xel.Name == "img") {
 					sb.Append (RenderImage (xel));
 				} else if (xel.Name == "c") {
-					sb.AppendFormat ("<code class='code'>{0}</code>", xel.Value);
+					sb.AppendFormat ("<code class='code'>{0}</code>", HttpUtility.HtmlEncode (xel.Value));
 				} else if (xel.Name == "format") {
 					sb.Append (RenderFormat (xel));
 				} else if (xel.Name == "list") {

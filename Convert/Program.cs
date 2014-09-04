@@ -31,8 +31,8 @@ class X {
 		if (args.Length > 0)
 			path = args [0];
 		int col = 0;
-		string start = "AVPlayer.xml";
-		bool started = false;
+		string start = "UITableView.xml";
+		bool started = true;
 #if debug || true
 		var e = XDocument.Load ("/tmp/fox1");
 		var he = Convert (e.Root);
@@ -95,7 +95,14 @@ class X {
 			//estr = estr.Replace (" />", "/>");
 			sb.Clear ();
 			foreach (var c in ret) {
-				sb.Append (c.ToString ());
+				try {
+					if (c is XComment)
+						sb.Append ((c as XComment).Value);
+					else
+						sb.Append (c.ToString ());
+				} catch (ArgumentException e){
+					// An XML comment cannot end with "-" looks like a bug
+				}
 			}
 			var result = sb.ToString ();
 
@@ -104,7 +111,7 @@ class X {
 				var xexpected = new XmlTextReader (new StringReader ("<group>" + expected + "</group>"));
 				var xresult = new XmlTextReader (new StringReader ("<group>" + result + "</group>"));
 			
-				var equal = diff.Compare (xexpected, xresult, new XmlTextWriter (Console.Out));
+				var equal = diff.Compare (xexpected, xresult); //, new XmlTextWriter (Console.Out));
 
 
 				if (!equal && expected != result) {
@@ -132,7 +139,8 @@ class X {
 			c = p-10;
 		else
 			c = 0;
-
+		Console.WriteLine (currentFile);
+		return;
 		Console.WriteLine ("\n{2}\nOriginal: {0}\nNew: {1}\n", OneLine (original.Substring (c)), OneLine (news.Substring (c)), currentFile);
 	}
 
@@ -176,7 +184,10 @@ class X {
 				var kind = element.Attributes ["class"].Value;
 				switch (kind) {
 				case "code":
-					yield return new XElement ("c", new XText (element.InnerText));
+					var c = new XElement ("c");
+					foreach (var n in ParseRoot (element))
+						c.Add (n);
+					yield return c;
 					break;
 				case "langword":
 					yield return new XElement ("see", new XAttribute ("langword", element.InnerText));
@@ -191,6 +202,10 @@ class X {
 					throw new NotImplementedException ("Do not know how to handle <code class='" + kind);
 				}
 				break;
+			case "img":
+				yield return new XElement ("img", new XAttribute ("href", element.Attributes ["src"].Value));
+				break;
+
 			default:
 				if (element is HtmlTextNode) {
 					yield return new XText (HttpUtility.HtmlDecode ((element as HtmlTextNode).Text));
@@ -218,17 +233,23 @@ class X {
 		var ftr = node.ChildNodes ["tr"];
 		var nodes = ftr.SelectNodes ("th");
 		var term = new XElement ("term", ParseRoot (nodes [0]));
-		var desc = new XElement ("description", ParseRoot (nodes [1]));
+		var header = new XElement ("listheader", term);
+		foreach (var desc in nodes.Skip (1))
+			header.Add (new XElement ("description", ParseRoot (desc)));
 
-		var list = new XElement ("list", new XAttribute ("type", "table"), new XElement ("listheader", term, desc));
+		var list = new XElement ("list", new XAttribute ("type", "table"), header);
 
 		int tr = 0;
 		foreach (var child in node.SelectNodes ("tr").Skip (1)){
 
 			var tds = child.SelectNodes ("td");
 			term = new XElement ("term", ParseRoot (tds [0]));
-			desc = new XElement ("description", ParseRoot (tds[1]));
-			list.Add (new XElement ("item", term, desc));
+			var item = new XElement ("item", term);
+
+			foreach (var desc in tds.Skip (1))
+				item.Add (new XElement ("description", ParseRoot (desc)));
+
+			list.Add (item);
 		}
 
 		return list;
@@ -264,15 +285,23 @@ class X {
 				var tn = child as HtmlTextNode;
 				xp.Add (new XText (HttpUtility.HtmlDecode (tn.Text)));
 			} else if (child is HtmlNode) {
-				if (child.Name == "a") {
+				var childName = child.Name;
+
+				switch (child.Name) {
+				case "a":
 					xp.Add (new XElement ("see", new XAttribute ("cref", child.Attributes ["href"].Value)));
-				} else if (child.Name == "img") {
+					break;
+				case "img":
 					xp.Add (new XElement ("img", new XAttribute ("href", child.Attributes ["src"].Value)));
-				} else if (child.Name == "code") {
+					break;
+				case "code":
 					var kind = child.Attributes ["class"].Value;
 					switch (kind) {
 					case "code":
-						xp.Add (new XElement ("c", new XText (HttpUtility.HtmlDecode (child.InnerText))));
+						var c = new XElement ("c");
+						foreach (var n in ParseRoot (child))
+							c.Add (n);
+						xp.Add (c);
 						break;
 					case "langword":
 						xp.Add (new XElement ("see", new XAttribute ("langword", child.InnerHtml)));
@@ -286,11 +315,21 @@ class X {
 					default:
 						throw new NotImplementedException ("Do not know how to handle <code class='" + kind);
 					}
-				} else if (child.Name == "div")
+					break;
+				case "div":
 					foreach (var divNode in ParseDiv (child))
 						xp.Add (divNode);
-				else
+					break;
+				case "table":
+					xp.Add (ParseTable (child));
+					break;
+				case "ul":
+				case "ol":
+					xp.Add (ParseList (child, childName == "ul" ? "bullet" : "number"));
+					break;
+				default:
 					throw new NotImplementedException ("Do not know how to handle " + child.Name);
+				}
 			}
 		}
 		return xp;
@@ -303,6 +342,9 @@ class X {
 				target.Add (new XText ((n as HtmlTextNode).Text));
 			else {
 				var nt = new XElement (n.Name);
+				foreach (var a in n.Attributes) {
+					nt.Add (new XAttribute (a.Name, a.Value));
+				}
 				Verbatim (nt, n.ChildNodes);
 				target.Add (nt);
 			}
@@ -315,7 +357,7 @@ class X {
 		if (dclass.StartsWith ("lang-")) {
 			var code = new XElement ("code", new XAttribute ("lang", dclass.Substring (5).Replace ("sharp", "#")));
 
-			var cdata = node.Attributes ["cdata"];
+			var cdata = node.Attributes ["data-cdata"];
 			if (cdata != null) {
 				code.Add (new XCData (HttpUtility.HtmlDecode (node.FirstChild.InnerText)));
 			} else {
@@ -324,14 +366,16 @@ class X {
 			}
 			yield return code;
 		} else if (dclass == "example") {
+			var example = new XElement ("example");
 			foreach (var child in node.ChildNodes) {
 				if (child is HtmlTextNode)
-					yield return new XText ((child as HtmlTextNode).Text);
+					example.Add (new XText (HttpUtility.HtmlDecode ((child as HtmlTextNode).Text)));
 				else if (child.Name != "div" || !child.Attributes ["class"].Value.StartsWith ("lang-"))
 					throw new NotImplementedException ("Do not know how to handle " + child.OuterHtml);
 				else
-					yield return new XElement ("example", ParseDiv (child));
+					example.Add (ParseDiv (child));
 			}
+			yield return example;
 		} else if (dclass == "verbatim") {
 			var format = new XElement ("format", new XAttribute ("type", "text/html"));
 			Verbatim (format, node.ChildNodes);
@@ -342,15 +386,21 @@ class X {
 			foreach (var child in ParseRoot (node))
 				block.Add (child);
 			yield return block;
-		} else if (dclass == "related"){
+		} else if (dclass == "related") {
 			var link = node.ChildNodes ["a"];
 			if (link != null) {
 				var href = link.Attributes ["href"].Value;
-				var type = (link.FirstChild as HtmlTextNode).Text;
+				var type = link.Attributes ["data-type"].Value;
+				var text = (link.FirstChild as HtmlTextNode).Text;
 				// this could be more robust, perhaps we should put the type not inside the child, but as an attribute in the <a>
 
-				yield return new XElement ("related", new XAttribute ("type", type), new XAttribute ("href", href));
+				var related = new XElement ("related", new XAttribute ("type", type), new XAttribute ("href", href));
+				if (text != null && text != "")
+					related.Add (new XText (HttpUtility.HtmlDecode (text)));
+				yield return related;
 			}
+		} else if (dclass == "cdata") {
+			yield return new XCData (HttpUtility.HtmlDecode (node.InnerText));
 		} else
 			throw new NotImplementedException ("Unknown div style: " + dclass);
 	}
@@ -378,13 +428,13 @@ class X {
 						// The warning should just be about a para started if we had text initially:
 						// IMPORTANT: If you uncomment the next line, change the "continue" for a "break"
 						//sb.AppendFormat ("{0}", RenderPara (root.Nodes ()));
-						sb.Append ((node as XText).Value);
+						sb.Append (EncodeText (node as XText));
 					}
 					renderedText = true;
 				} else if (seenPara && currentFile.IndexOf ("MonoTouch.Dialog") == -1)
 					WarningDangling (root, node);
-				else 
-					sb.AppendFormat ("{0}", ((node as XText).Value));
+				else
+					sb.Append (EncodeText (node as XText));
 				continue; // break
 			}
 			first = false;
@@ -446,7 +496,7 @@ class X {
 					sb.Append (RenderTypeParamRef (el));
 					break;
 				case "c":
-					sb.AppendFormat ("<code class='code'>{0}</code>", el.Value);
+					sb.Append (RenderC (el));
 					break;
 				default:
 					Console.WriteLine ("File: {0} node: {1}", currentFile, el);
@@ -455,17 +505,25 @@ class X {
 			} else if (node is XComment) {
 				var xc = node as XComment;
 				sb.AppendFormat ("<!--{0}-->", xc.Value);
-			} else 
+			} else
 				throw new NotImplementedException ("Do not know how to handle " + node.GetType ());
 		}
 		return sb.ToString ();
+	}
+
+	static string EncodeText (XText text)
+	{
+		if (text.NodeType == XmlNodeType.CDATA)
+			return string.Format ("<div class='cdata'>{0}</div>", HttpUtility.HtmlEncode (text.Value));
+		else
+			return HttpUtility.HtmlEncode (text.Value);
 	}
 
 	static string RenderRelated (XElement el)
 	{
 		var type = el.Attribute ("type").Value;
 		var href = el.Attribute ("href").Value;
-		return string.Format ("<div class='related'>Related: <a href='{1}'>{0}</a></div>", type, href);
+		return string.Format ("<div class='related'>Related: <a data-type='{0}' href='{1}'>{2}</a></div>", type, href, HttpUtility.HtmlEncode (el.Value));
 	}
 
 	static string RenderList (XElement el)
@@ -495,20 +553,11 @@ class X {
 	static string RenderTableElement (string kind, XElement top)
 	{
 		var sb = new StringBuilder ();
-		sb.AppendFormat (
-			" <tr>\n  <{0}>{1}</{0}><{0}>{2}</{0}>\n </tr>", kind, Convert (top.Element ("term")),
-			string.Join ("\n  ", top.Elements ("description").Select (x => Convert (x)).ToArray ()));
-		return sb.ToString ();
-	}
+		sb.AppendFormat ("<tr>\n  <{0}>{1}</{0}>", kind, Convert (top.Element ("term")));
 
-	// Renders the table header
-	// <listHeader><term>..</term><description>..</description>+
-	static string RenderTableHeader (XElement listHeader)
-	{
-		var sb = new StringBuilder ();
-		sb.AppendFormat (
-			" <tr><th>{0}</th><th>{1}</th></tr>", Convert (listHeader.Element ("term")),
-			string.Join ("\n  ", listHeader.Elements ("description").Select (x => string.Format ("<th>{0}</th>", Convert (x))).ToArray ()));
+		foreach (var desc in top.Elements ("description"))
+			sb.AppendFormat ("  <{0}>{1}</{0}>", kind, Convert (desc));
+		sb.Append ("</tr>");
 		return sb.ToString ();
 	}
 
@@ -525,13 +574,20 @@ class X {
 	// Renders <example>...</example>
 	static string RenderExample (XElement el)
 	{
-		return string.Format ("<div class='example'>{0}</div>", RenderExample (el.Elements ()));
+		return string.Format ("<div class='example'>{0}</div>", RenderPara (el.Nodes ()));
 	}
 
 	static string RenderBlock (XElement el)
 	{
 		var attr = el.Attribute ("type").Value;
 		return string.Format ("<div class='block {0}'>{1}</div>", attr, Convert (el));
+	}
+
+
+	// REnders a <c>...</c> optionally with a CData
+	static string RenderC (XElement el)
+	{
+		return string.Format ("<code class='code'>{0}</code>", Convert (el));
 	}
 
 	// Renders <para>...</para>
@@ -548,17 +604,19 @@ class X {
 				} else if (xel.Name == "img") {
 					sb.Append (RenderImage (xel));
 				} else if (xel.Name == "c") {
-					sb.AppendFormat ("<code class='code'>{0}</code>", HttpUtility.HtmlEncode (xel.Value));
+					sb.Append (RenderC (xel));
 				} else if (xel.Name == "format") {
 					sb.Append (RenderFormat (xel));
 				} else if (xel.Name == "list") {
-					sb.AppendFormat ("</p>{0}<p>", RenderList (xel));
+					sb.AppendFormat ("{0}", RenderList (xel));
 				} else if (xel.Name == "paramref") {
-					sb.AppendFormat (RenderParamRef (xel));
+					sb.Append (RenderParamRef (xel));
 				} else if (xel.Name == "typeparamref") {
-					sb.AppendFormat (RenderTypeParamRef (xel));
+					sb.Append (RenderTypeParamRef (xel));
 				} else if (xel.Name == "example") {
 					Console.WriteLine ("EXAMPLE at {0}", currentFile);
+				} else if (xel.Name == "code") {
+					sb.Append (RenderCode (xel));
 				} else {
 					Console.WriteLine ("File: {0}, Node: {1}", currentFile, node);
 					throw new NotImplementedException ("Unsupported element in RenderPara: " + xel.Name);
@@ -643,7 +701,7 @@ class X {
 			var child = code.FirstNode;
 
 			if (child is XCData) {
-				cdata = " cdata='true'";
+				cdata = " data-cdata='true'";
 				value = HttpUtility.HtmlEncode ((child as XCData).Value);
 			} else
 				value = child.ToString ();

@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using HtmlAgilityPack;
 using System.Web;
-using Microsoft.XmlDiffPatch;
 
 public class UnsupportedElementException : Exception {
 	public UnsupportedElementException (string message) : base (message) {}

@@ -68,8 +68,11 @@ static class XmlToEcma {
 					yield return ParseP (element);
 				break;
 			case "div":
-				foreach (var div in ParseDiv (element))
-					yield return div;
+				if (element.Attributes ["class"] != null) {
+					foreach (var div in ParseDiv (element))
+						yield return div;
+				} else
+					yield return ParseP (element);
 				break;
 			case "table":
 				yield return ParseTable (element);
@@ -214,7 +217,7 @@ static class XmlToEcma {
 						xp.Add (new XElement ("typeparamref", new XAttribute ("name", child.InnerHtml)));
 						break;
 					default:
-						throw new UnsupportedElementException ("Do not know how to handle <code class='" + kind);
+						throw new UnsupportedElementException ("Do not know how to handle <code class='" + kind + "'>");
 					}
 					break;
 				case "div":
@@ -224,12 +227,14 @@ static class XmlToEcma {
 				case "table":
 					xp.Add (ParseTable (child));
 					break;
+				case "br":
+					break;
 				case "ul":
 				case "ol":
 					xp.Add (ParseList (child, childName == "ul" ? "bullet" : "number"));
 					break;
 				default:
-					throw new UnsupportedElementException ("Do not know how to handle " + child.Name);
+					throw new UnsupportedElementException ("Do not know how to handle <" + child.Name + "> inside a <p>");
 				}
 			}
 		}
@@ -271,10 +276,15 @@ static class XmlToEcma {
 			foreach (var child in node.ChildNodes) {
 				if (child is HtmlTextNode)
 					example.Add (new XText (HttpUtility.HtmlDecode ((child as HtmlTextNode).Text)));
-				else if (child.Name != "div" || !child.Attributes ["class"].Value.StartsWith ("lang-"))
-					throw new UnsupportedElementException ("Do not know how to handle " + child.OuterHtml);
-				else
-					example.Add (ParseDiv (child));
+				else if (child.Name == "div") {
+					var _edclass = child.Attributes ["class"];
+					var edclass = _edclass == null ? null : _edclass.Value;
+					if (edclass != null && !(edclass.StartsWith ("lang-") || edclass== "example-body"))
+						throw new UnsupportedElementException ("Do not know how to handle a div whose class does not start with lang- inside an <div class='example'>");
+					if (edclass != "skip")
+						example.Add (ParseDiv (child));
+				} else
+					throw new UnsupportedElementException ("Do not know how to handled non-div elements inside <example>");
 			}
 			yield return example;
 		} else if (dclass == "verbatim") {
@@ -489,7 +499,7 @@ class EcmaToXml {
 	// Renders <example>...</example>
 	string RenderExample (XElement el)
 	{
-		return string.Format ("<div class='example'>{0}</div>", RenderPara (el.Nodes ()));
+		return string.Format ("<div class='example'><div class='skip example-title' contenteditable='false'>Example</div><div class='example-body'>{0}</div></div>", RenderPara (el.Nodes ()));
 	}
 
 	string RenderBlock (XElement el)

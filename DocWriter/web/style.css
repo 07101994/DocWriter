@@ -34,4 +34,17 @@
 
 .example {
 	background-color: #eee;
+	border-width: 1px;
+	border-color:#5686e5;
+	border-style: solid;
+}
+
+.example-title {
+	color: #ddd;
+	background-color: #5686e5;
+	padding: 5px
+}
+
+.example-body {
+	padding: 5px;
 }

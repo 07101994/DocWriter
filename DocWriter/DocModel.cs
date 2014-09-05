@@ -41,8 +41,10 @@ namespace DocWriter
 				try {
 					var str = lookup.Fetch (arg);
 					DocConverter.ToXml (str).ToArray ();
-				} catch {
-					return "Failure loading " + arg;
+				} catch (UnsupportedElementException e){
+					return "Parsing error: " + e.Message;
+				} catch (StackOverflowException e){
+					return "Exception " + e.GetType ().ToString ();
 				}
 			}
 			return null;

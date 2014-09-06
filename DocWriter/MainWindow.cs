@@ -7,27 +7,6 @@
 // Copyright 2014 Xamarin Inc
 //
 //
-// TODO: 
-//   Add image loading support
-//   Allow editing of the enums at the type level, without having to go element by element
-//   Force a save on quit.
-//   Add try/catch around the validation timer, and catch errors there
-//   Hookup Command-S to save, for the paranoid in us.
-//   Hotkeys to insert various kinds of markup
-//   Implement an "Insert HTML text" option as we can currently only add text at the current location.
-//
-// Wanted:
-//   Flag members that are auto-documented as such, to now waste documenters time on it.
-//
-// Debate:
-//   Render all summaries at type or namespace level, and provide a dedicated editor to just fill those out quickly?
-//
-// Current save strategy is not great: it saves the content of the page on quit, but this would
-// not work very well when we render a page that aggragatges many children (a namespace or all members)
-// since it would only trigger a save on switch, and that might be too late (specially during the debugging
-// stages of this).
-//
-// For something like that to work, it might be nice to save dirty elements on focus change.
 //
 using System;
 using System.Collections.Generic;

@@ -14,6 +14,7 @@
 //   Add try/catch around the validation timer, and catch errors there
 //   Hookup Command-S to save, for the paranoid in us.
 //   Hotkeys to insert various kinds of markup
+//   Implement an "Insert HTML text" option as we can currently only add text at the current location.
 //
 // Wanted:
 //   Flag members that are auto-documented as such, to now waste documenters time on it.
@@ -114,6 +115,11 @@ namespace DocWriter
 				return;
 
 			webView.MainFrame.LoadHtmlString (ihtml.Render (), NSBundle.MainBundle.ResourceUrl);
+		}
+
+		public void InsertHtml (string html)
+		{
+			webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAtCursor(\"" + html + "\")");
 		}
 
 		class DocumentTreeDelegate : NSOutlineViewDelegate {

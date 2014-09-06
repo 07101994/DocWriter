@@ -55,3 +55,8 @@ function getHtml(xid)
 
     return element.innerHTML;
 }
+
+function insertHtmlAtCursor (html)
+{
+    insertTextAtCursor (html);
+}

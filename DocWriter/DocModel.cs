@@ -1,4 +1,12 @@
-﻿using System;
+﻿//
+// DocModel.cs: Contains the various nodes that know how to render and edit pages
+//
+// Author:
+//   Miguel de Icaza (miguel@xamarin.com)
+//
+// Copyright 2014 Xamarin Inc
+//
+using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
@@ -10,6 +18,8 @@ using System.Text;
 
 namespace DocWriter
 {
+	// Interface implemented by nodes that can render themselves as HTML
+	// typically this renders the editable content as well.
 	interface IHtmlRender {
 		string Render ();
 	}
@@ -19,6 +29,8 @@ namespace DocWriter
 		string Fetch (string id);
 	}
 
+
+	// Interface implemented by nodes that can provide editing functionality
 	interface IEditableNode {
 		string ValidateChanges (ILookup lookup);
 		bool Save (ILookup lookup, out string error);
@@ -34,6 +46,14 @@ namespace DocWriter
 			return DocConverter.ToHtml (element.XPathSelectElement (xpath), Name.ToString ());
 		}
 			
+		//
+		// Updates the target XElement with the edited text.   
+		// The first pass uses the provided xpath expression to remove all the nodes that match
+		// this expression from the target (this cleans the nodes that we are about to replace)
+		// then the named htmlElement is used to lookup the contents on WebKit and the results
+		// are converted back to XML which is stashed in the target specified by xpath.
+		//
+		// Returns true on success
 		public bool UpdateNode (ILookup lookup, XElement target, string xpath, string htmlElement, out string error)
 		{
 			error = null;
@@ -51,21 +71,11 @@ namespace DocWriter
 			return true;
 		}
 
-		public XNode[] xParse (ILookup lookup, string element, out string error)
-		{
-			error = null;
-			try {
-				var str = lookup.Fetch (element);
-				return DocConverter.ToXml (str).ToArray ();
-			} catch (UnsupportedElementException e){
-				error = "Parsing error: " + e.Message;
-			} catch (StackOverflowException e){
-				error = "Exception " + e.GetType ().ToString ();
-			}
-			return null;
-		}
-
+		// Validates that the elements named in 'args' in WebKit can be converted
+		// from HTML back into ECMA XML.
+		//
 		// Returns null on success, otherwise a string with the error details
+		//
 		public string ValidateElements (ILookup lookup, params string [] args)
 		{
 			foreach (var arg in args) {
@@ -82,6 +92,7 @@ namespace DocWriter
 		}
 	}
 
+	// DocMember: renders an ECMA type member (methods, properties, properties, fields)
 	public class DocMember : DocNode, IHtmlRender, IEditableNode {
 		public DocType Type { get; private set; }
 		XElement e;
@@ -154,6 +165,7 @@ namespace DocWriter
 
 	}
 
+	// DocType: renders an ECMA type
 	public class DocType : DocNode, IHtmlRender, IEditableNode {
 		XDocument doc;
 		public DocNamespace Namespace { get; private set; }
@@ -248,6 +260,7 @@ namespace DocWriter
 		}
 	}
 
+	// Provides a host to show the namespace on the tree.
 	public class DocNamespace : DocNode {
 		SortedList<string,DocType> docs = new SortedList<string, DocType> ();
 		string path;
@@ -277,6 +290,7 @@ namespace DocWriter
 		}
 	}
 
+	// Loads the documentation from disk, on demand.
 	public class DocModel
 	{
 		List<DocNamespace> namespaces = new List<DocNamespace> ();

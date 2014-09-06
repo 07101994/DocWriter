@@ -1,5 +1,5 @@
 ﻿//
-// Convert.cs: Routines to turn ECMA XML into an HTML string and this subset of HTML back into ECMA XML
+// MainWindow.cs: contains the handling of the main shell.
 //
 // Author:
 //   Miguel de Icaza (miguel@xamarin.com)

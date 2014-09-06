@@ -1,0 +1,36 @@
+﻿@model DocMember
+<html>
+<head>
+  <script src="web/editor.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="web/style.css">
+
+</head>
+<body>
+  <div class="caption">@Model.Name<br>
+	  <div style="font-size:80%;">@Model.Kind</div>
+  </div>
+  <div class="title">Summary:</div>
+  <div class='edit' id='summary' contenteditable='true'>@{WriteLiteral (Model.GetHtml ("Docs/summary"));}</div>
+  @if (Model.Params.Count () > 0){
+    <div class="title">Parameters:</div>
+  	foreach (var p in Model.Params){ 
+  	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
+  	   <div class="parameter-name">@name</div>
+  	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">
+  	   @{WriteLiteral (DocConverter.ToHtml (p,""));}
+  	   </div>
+  	}
+  }
+  @if (Model.ReturnValue != null){
+     <div class="title">Return Value:</div>
+     <div class="edit return" contenteditable='true' id='return'>
+     @{WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));}
+     </div>
+  }
+  @if (Model.Remarks != null){
+	  <div class="title">Remarks:</div>
+	  <div class="edit" id='remarks' contenteditable='true'>@{WriteLiteral (Model.GetHtml ("Docs/remarks"));}</div>
+  }
+</body>
+</html>

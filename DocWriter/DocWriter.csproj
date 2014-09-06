@@ -91,6 +91,9 @@
     <Compile Include="..\Convert\DocConverter.cs">
       <Link>DocConverter.cs</Link>
     </Compile>
+    <Compile Include="MemberTemplate.cs">
+      <DependentUpon>MemberTemplate.cshtml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
@@ -99,6 +102,10 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="packages.config" />
+    <None Include="MemberTemplate.cshtml">
+      <Generator>RazorTemplatePreprocessor</Generator>
+      <LastGenOutput>MemberTemplate.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

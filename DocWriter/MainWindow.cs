@@ -1,8 +1,32 @@
 ﻿//
+// Convert.cs: Routines to turn ECMA XML into an HTML string and this subset of HTML back into ECMA XML
+//
+// Author:
+//   Miguel de Icaza (miguel@xamarin.com)
+//
+// Copyright 2014 Xamarin Inc
+//
+//
 // TODO: 
-// * Cope with <br>
-// * Cope with nodes that did not start with a <p> surrounding the thing.
-//    => If we fail parsing, we try by surrounding with <p>
+//   Add image loading support
+//   Allow editing of the enums at the type level, without having to go element by element
+//   Force a save on quit.
+//   Add try/catch around the validation timer, and catch errors there
+//   Hookup Command-S to save, for the paranoid in us.
+//   Hotkeys to insert various kinds of markup
+//
+// Wanted:
+//   Flag members that are auto-documented as such, to now waste documenters time on it.
+//
+// Debate:
+//   Render all summaries at type or namespace level, and provide a dedicated editor to just fill those out quickly?
+//
+// Current save strategy is not great: it saves the content of the page on quit, but this would
+// not work very well when we render a page that aggragatges many children (a namespace or all members)
+// since it would only trigger a save on switch, and that might be too late (specially during the debugging
+// stages of this).
+//
+// For something like that to work, it might be nice to save dirty elements on focus change.
 //
 using System;
 using System.Collections.Generic;
@@ -53,8 +77,15 @@ namespace DocWriter
 
 		void CheckContents ()
 		{
-			if (currentObject != null && currentObject is ILoader) {
-				var result = (currentObject as ILoader).Load (this);
+			if (currentObject != null && currentObject is IEditableNode) {
+				string result;
+
+				try {
+					result = (currentObject as IEditableNode).ValidateChanges (this);
+				} catch (Exception e){
+					result = e.ToString ();
+				}
+
 				if (result != null)
 					statusLabel.Cell.StringValue = result;
 				else
@@ -64,6 +95,19 @@ namespace DocWriter
 
 		void SelectionChanged ()
 		{
+			if (currentObject != null) {
+				var editable = currentObject as IEditableNode;
+				currentObject = null;
+
+				if (editable != null) {
+					string error;
+					if (!editable.Save (this, out error)) {
+						// FIXME: popup a window or something.
+					}
+				}
+			}
+
+
 			currentObject = outline.ItemAtRow (outline.SelectedRow);
 			var ihtml = currentObject as IHtmlRender;
 			if (ihtml == null)
@@ -83,7 +127,6 @@ namespace DocWriter
 			public override void SelectionDidChange (NSNotification notification)
 			{
 				win.SelectionChanged ();
-				Console.WriteLine ("changing");
 			}
 		}
 	}

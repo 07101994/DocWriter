@@ -48,3 +48,15 @@
 .example-body {
 	padding: 5px;
 }
+
+.parameter-name {
+	font-style: italic;
+	margin-left: 1em;
+}
+.parameter-doc {
+	margin-left: 2em;
+}
+
+table, td, tr {
+	border: 1px solid black;
+}

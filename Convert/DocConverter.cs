@@ -134,7 +134,11 @@ static class XmlToEcma {
 
 	static XElement ParseTable (HtmlNode node)
 	{
-		var ftr = node.ChildNodes ["tr"];
+		var lookupNode = node.ChildNodes ["tbody"];
+		if (lookupNode == null)
+			lookupNode = node;
+
+		var ftr = lookupNode.ChildNodes ["tr"];
 		var nodes = ftr.SelectNodes ("th");
 		var term = new XElement ("term", ParseRoot (nodes [0]));
 		var header = new XElement ("listheader", term);
@@ -144,7 +148,7 @@ static class XmlToEcma {
 		var list = new XElement ("list", new XAttribute ("type", "table"), header);
 
 		int tr = 0;
-		foreach (var child in node.SelectNodes ("tr").Skip (1)){
+		foreach (var child in lookupNode.SelectNodes ("tr").Skip (1)){
 
 			var tds = child.SelectNodes ("td");
 			term = new XElement ("term", ParseRoot (tds [0]));
@@ -463,7 +467,7 @@ class EcmaToXml {
 			sb.AppendFormat ("<ol>{0}</ol>", RenderListBullet (el.Elements ()));
 			break;
 		case "table":
-			sb.AppendFormat ("<table>\n{0}\n{1}\n</table>", 
+			sb.AppendFormat ("<table style='width:100%; table-layout: fixed; border-collapse: collapse;'>\n{0}\n{1}\n</table>", 
 				RenderTableElement ("th", el.Element ("listheader")), 
 				string.Join ("\n", el.Elements ("item").Select (x => RenderTableElement ("td", x)).ToArray ()));
 			break;

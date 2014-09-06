@@ -18,13 +18,13 @@ using System.Text;
 
 
 [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorTemplatePreprocessor", "2.6.0.0")]
-public partial class TypeTemplate : TypeTemplateBase
+public partial class MemberTemplate : MemberTemplateBase
 {
 
 #line hidden
 
-#line 1 "TypeTemplate.cshtml"
-public DocType Model { get; set; }
+#line 1 "MemberTemplate.cshtml"
+public DocMember Model { get; set; }
 
 #line default
 #line hidden
@@ -55,13 +55,26 @@ WriteLiteral(" class=\"caption\"");
 WriteLiteral(">");
 
 
-#line 10 "TypeTemplate.cshtml"
+#line 10 "MemberTemplate.cshtml"
                   Write(Model.Name);
 
 
 #line default
 #line hidden
-WriteLiteral("</div>\n  <div");
+WriteLiteral("<br>\n\t  <div");
+
+WriteLiteral(" style=\"font-size:80%;\"");
+
+WriteLiteral(">");
+
+
+#line 11 "MemberTemplate.cshtml"
+                          Write(Model.Kind);
+
+
+#line default
+#line hidden
+WriteLiteral("</div>\n  </div>\n  <div");
 
 WriteLiteral(" class=\"title\"");
 
@@ -76,16 +89,156 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 12 "TypeTemplate.cshtml"
-                                                          WriteLiteral (Model.SummaryHtml);
+#line 14 "MemberTemplate.cshtml"
+                                                          WriteLiteral (Model.GetHtml ("Docs/summary"));
 
 #line default
 #line hidden
-WriteLiteral("</div>\n  <div");
+WriteLiteral("</div>\n");
+
+
+#line 15 "MemberTemplate.cshtml"
+  
+
+#line default
+#line hidden
+
+#line 15 "MemberTemplate.cshtml"
+   if (Model.Params.Count () > 0){
+
+
+#line default
+#line hidden
+WriteLiteral("    <div");
 
 WriteLiteral(" class=\"title\"");
 
-WriteLiteral(">Remarks:</div>\n  <div");
+WriteLiteral(">Parameters:</div>\n");
+
+
+#line 17 "MemberTemplate.cshtml"
+  	foreach (var p in Model.Params){ 
+  	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
+
+
+#line default
+#line hidden
+WriteLiteral("  \t   <div");
+
+WriteLiteral(" class=\"parameter-name\"");
+
+WriteLiteral(">");
+
+
+#line 19 "MemberTemplate.cshtml"
+                             Write(name);
+
+
+#line default
+#line hidden
+WriteLiteral("</div>\n");
+
+WriteLiteral("  \t   <div");
+
+WriteLiteral(" class=\"edit parameter-doc\"");
+
+WriteLiteral(" contenteditable=\'true\'");
+
+WriteAttribute ("id", " id=\"", "\""
+
+#line 20 "MemberTemplate.cshtml"
+                          , Tuple.Create<string,object,bool> ("", paramid
+
+#line default
+#line hidden
+, false)
+);
+WriteLiteral(">\n");
+
+
+#line 21 "MemberTemplate.cshtml"
+  	   
+
+#line default
+#line hidden
+
+#line 21 "MemberTemplate.cshtml"
+        WriteLiteral (DocConverter.ToHtml (p,""));
+
+#line default
+#line hidden
+WriteLiteral("\n  \t   </div>\n");
+
+
+#line 23 "MemberTemplate.cshtml"
+  	}
+  }
+
+
+#line default
+#line hidden
+WriteLiteral("  ");
+
+
+#line 25 "MemberTemplate.cshtml"
+   if (Model.ReturnValue != null){
+
+
+#line default
+#line hidden
+WriteLiteral("     <div");
+
+WriteLiteral(" class=\"title\"");
+
+WriteLiteral(">Return Value:</div>\n");
+
+WriteLiteral("     <div");
+
+WriteLiteral(" class=\"edit return\"");
+
+WriteLiteral(" contenteditable=\'true\'");
+
+WriteLiteral(" id=\'return\'");
+
+WriteLiteral(">\n");
+
+
+#line 28 "MemberTemplate.cshtml"
+     
+
+#line default
+#line hidden
+
+#line 28 "MemberTemplate.cshtml"
+       WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));
+
+#line default
+#line hidden
+WriteLiteral("\n     </div>\n");
+
+
+#line 30 "MemberTemplate.cshtml"
+  }
+
+
+#line default
+#line hidden
+WriteLiteral("  ");
+
+
+#line 31 "MemberTemplate.cshtml"
+   if (Model.Remarks != null){
+
+
+#line default
+#line hidden
+WriteLiteral("\t  <div");
+
+WriteLiteral(" class=\"title\"");
+
+WriteLiteral(">Remarks:</div>\n");
+
+WriteLiteral("\t  <div");
 
 WriteLiteral(" class=\"edit\"");
 
@@ -96,12 +249,21 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 14 "TypeTemplate.cshtml"
-                                                          WriteLiteral (Model.RemarksHtml);
+#line 33 "MemberTemplate.cshtml"
+                                                           WriteLiteral (Model.GetHtml ("Docs/remarks"));
 
 #line default
 #line hidden
-WriteLiteral("</div>\n</body>\n</html>");
+WriteLiteral("</div>\n");
+
+
+#line 34 "MemberTemplate.cshtml"
+  }
+
+
+#line default
+#line hidden
+WriteLiteral("</body>\n</html>");
 
 }
 }
@@ -109,7 +271,7 @@ WriteLiteral("</div>\n</body>\n</html>");
 // NOTE: this is the default generated helper class. You may choose to extract it to a separate file 
 // in order to customize it or share it between multiple templates, and specify the template's base 
 // class via the @inherits directive.
-public abstract class TypeTemplateBase
+public abstract class MemberTemplateBase
 {
 
 		// This field is OPTIONAL, but used by the default implementation of Generate, Write, WriteAttribute and WriteLiteral

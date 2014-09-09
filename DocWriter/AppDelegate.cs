@@ -24,17 +24,58 @@ namespace DocWriter
 			mainWindowController.Window.MakeKeyAndOrderFront (this);
 		}
 
+		void AppendNodeHtml (string html)
+		{
+			mainWindowController.Window.AppendNodeHtml (html);
+		}
+
+		void InsertHtml (string html)
+		{
+			mainWindowController.Window.InsertSpan (html);
+		}
+
 		[Export ("insertExample:")]
 		void InsertExample (NSObject sender)
 		{
-			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("..."))));
+			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {"))));
 
-			mainWindowController.Window.InsertHtml (DocConverter.ToHtml (example, ""));
+			AppendNodeHtml (DocConverter.ToHtml (example, ""));
+		}
+
+		[Export ("insertCode:")]
+		void InsertCode (NSObject sender)
+		{
+			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {")));
+
+			AppendNodeHtml (DocConverter.ToHtml (example, ""));
+		}
+
+		[Export ("insertFExample:")]
+		void InsertFExample (NSObject sender)
+		{
+			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = "))));
+
+			AppendNodeHtml (DocConverter.ToHtml (example, ""));
+		}
+
+		[Export ("insertFCode:")]
+		void InsertFCode (NSObject sender)
+		{
+			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = ")));
+
+			AppendNodeHtml (DocConverter.ToHtml (example, ""));
 		}
 
 		[Export ("insertReference:")]
 		void InsertReference (NSObject sender)
 		{
+			InsertHtml ("<a href=''>T:Type.Name</a>");
+		}
+
+		[Export ("saveDocument:")]
+		void SaveCurrentDocument (NSObject sender)
+		{
+			mainWindowController.Window.SaveCurrentObject ();
 		}
 	}
 }

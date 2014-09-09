@@ -62,7 +62,7 @@ namespace DocWriter
 
 			try {
 				var str = lookup.Fetch (htmlElement);
-				foreach (var ret in DocConverter.ToXml (str).ToArray ())
+				foreach (var ret in DocConverter.ToXml (str, canonical: true))
 					node.Add (ret);
 			} catch (UnsupportedElementException e){
 				error = e.Message;
@@ -81,7 +81,7 @@ namespace DocWriter
 			foreach (var arg in args) {
 				try {
 					var str = lookup.Fetch (arg);
-					DocConverter.ToXml (str).ToArray ();
+					DocConverter.ToXml (str, canonical: true);
 				} catch (UnsupportedElementException e){
 					return "Parsing error: " + e.Message;
 				} catch (StackOverflowException e){

@@ -73,20 +73,22 @@ namespace DocWriter
 			}
 		}
 
-		void SelectionChanged ()
+		public void SaveCurrentObject ()
 		{
-			if (currentObject != null) {
-				var editable = currentObject as IEditableNode;
-				currentObject = null;
+			var editable = currentObject as IEditableNode;
+			if (editable != null) {
+				string error;
 
-				if (editable != null) {
-					string error;
-					if (!editable.Save (this, out error)) {
-						// FIXME: popup a window or something.
-					}
+				if (!editable.Save (this, out error)) {
+					// FIXME: popup a window or something.
 				}
 			}
+		}
 
+		void SelectionChanged ()
+		{
+			SaveCurrentObject ();
+			currentObject = null;
 
 			currentObject = outline.ItemAtRow (outline.SelectedRow);
 			var ihtml = currentObject as IHtmlRender;
@@ -96,9 +98,14 @@ namespace DocWriter
 			webView.MainFrame.LoadHtmlString (ihtml.Render (), NSBundle.MainBundle.ResourceUrl);
 		}
 
-		public void InsertHtml (string html)
+		public void InsertSpan (string html)
 		{
-			webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAtCursor(\"" + html + "\")");
+			webView.StringByEvaluatingJavaScriptFromString ("insertSpanAtCursor(\"" + html + "\")");
+		}
+
+		public void AppendNodeHtml (string html)
+		{
+			webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAfterCurrentNode(\"" + html + "\")");
 		}
 
 		class DocumentTreeDelegate : NSOutlineViewDelegate {

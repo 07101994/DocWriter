@@ -49,6 +49,7 @@
 	padding: 5px;
 }
 
+
 .parameter-name {
 	font-style: italic;
 	margin-left: 1em;
@@ -59,4 +60,8 @@
 
 table, td, tr {
 	border: 1px solid black;
+}
+
+.language {
+	color: #999;
 }

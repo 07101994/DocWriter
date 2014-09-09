@@ -1,48 +1,47 @@
-function insertTextAtCursor(text) {
-    var sel, range, html;
-    if (window.getSelection) {
-        sel = window.getSelection();
-        if (sel.type == "Caret" && sel.getRangeAt && sel.rangeCount) {
-            range = sel.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode( document.createTextNode(text) );
-        }
-    } else if (document.selection && document.selection.createRange) {
-        document.selection.createRange().text = text;
+
+//
+// This should insert a-span like HTML inside the stuff we are adding
+//	
+function insertSpanAtCursor(html){
+	sel = window.getSelection ()
+    if (sel.type == "Caret") {    	
+        range = sel.getRangeAt(0);
+        range.deleteContents();
+	    newfrag = range.createContextualFragment (html);
+
+        range.insertNode(newfrag);
+
+        // now set the cursor
+        range2 = range.cloneRange ();
+        range2.setStartAfter (range.startContainer.nextSibling);
+        range2.collapse (true);
+        sel.removeAllRanges ();
+        sel.addRange (range2);
     }
 }
 
-function getCaretPosition(editableDiv) {
-    var caretPos = 0, containerEl = null, sel, range;
-    if (window.getSelection) {
-        sel = window.getSelection();
-        if (sel.rangeCount) {
-            range = sel.getRangeAt(0);
-	    return range;
+// Use this to add stuff after the current node, for example to
+// add a table, or add a div with an example, since it shoudl not 
+// get inlined
 
-            if (range.commonAncestorContainer.parentNode == editableDiv) {
-                caretPos = range.endOffset;
-            }
-        }
-    } else if (document.selection && document.selection.createRange) {
-        range = document.selection.createRange();
-        if (range.parentElement() == editableDiv) {
-            var tempEl = document.createElement("span");
-            editableDiv.insertBefore(tempEl, editableDiv.firstChild);
-            var tempRange = range.duplicate();
-            tempRange.moveToElementText(tempEl);
-            tempRange.setEndPoint("EndToEnd", range);
-	    return tempRange;
-            caretPos = tempRange.text.length;
-        }
-    }
-    return caretPos;
-}
-
-function foo ()
+function insertHtmlAfterCurrentNode (html)
 {
-    p = getCaretPosition ($("#edit"));
-    p.insertNode (document.createTextNode ("foo"));
+	sel = window.getSelection ()
+    if (sel.type == "Caret"	) {
+    	cl = sel.focusNode.attributes ["class"];
+    	if (cl.value == "edit")
+    	   appendon = sel.focusNode;
+    	else {
+	        cl = sel.focusNode.parentNode.attributes ["class"]; 
+	    	if (cl == undefined || cl.value == "edit"){
+	    	   appendon = sel.focusNode.parentNode;
+	    	} else {
+			   appendon = sel.focusNode.parentNode.parentNode;
+	        }
+        }
+        range = sel.getRangeAt(0);
+        appendon.appendChild (range.createContextualFragment (html));
+    }
 }
 
 function getHtml(xid)
@@ -54,9 +53,4 @@ function getHtml(xid)
 		return "<>It is null and id=" + xid;
 
     return element.innerHTML;
-}
-
-function insertHtmlAtCursor (html)
-{
-    insertTextAtCursor (html);
 }

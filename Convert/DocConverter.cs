@@ -35,11 +35,16 @@ public static class DocConverter {
 	/// its invocation, in particular, after the user might have edited this in a contenteditable
 	/// that might have gotten elements that are not handled.
 	/// </remarks>
-	public static IEnumerable<XNode> ToXml (string htmlstr)
+	public static XNode [] ToXml (string htmlstr, bool canonical = false)
 	{
 		var doc = new HtmlDocument ();
 		doc.LoadHtml (htmlstr);
-		return XmlToEcma.ParseRoot (doc.DocumentNode).ToArray ();
+		var ret = XmlToEcma.ParseRoot (doc.DocumentNode).ToArray ();
+
+		if (canonical)
+			return XmlToEcma.Canonicalize (ret);
+		else
+			return ret;
 	}
 
 
@@ -82,7 +87,7 @@ static class XmlToEcma {
 				yield return ParseList (element, element.Name == "ul" ? "bullet" : "number");
 				break;
 			case "a":
-				yield return new XElement ("see", new XAttribute ("cref", element.Attributes ["href"].Value));
+				yield return new XElement ("see", new XAttribute ("cref", element.InnerText));
 				break;
 			case "code":
 				var kind = element.Attributes ["class"].Value;
@@ -120,6 +125,64 @@ static class XmlToEcma {
 				break;
 			}
 		}
+	}
+
+	static bool IsInlineElement (XNode node)
+	{
+		if (node is XText || node is XComment || node is XCData)
+			return true;
+		if (node is XElement) {
+			switch (((XElement)node).Name.ToString ()) {
+			case "para":
+			case "code":
+			case "list":
+			case "format":
+			case "example":
+			case "related":
+			case "block":
+				return false;
+			case "see":
+			case "img":
+			case "paramref":
+			case "typeparamref":
+			case "c":
+				return true;
+			}
+		}
+		throw new NotImplementedException ("Do not know if this kind of element can be inlined: " + node.GetType ().ToString ());
+	}
+
+	//
+	// This turns XML that might have text + toplevel containers into
+	// a <para> with the toplevel text + the rest of the containers
+	//
+	// This turns the invalid "foo<para>bar</para>" into "<para>foo</para><para>bar</para>
+	//
+	public static XNode [] Canonicalize (XNode [] nodes)
+	{
+		if (nodes.Length > 0 && nodes [0] is XElement && (nodes [0] as XElement).Name == "para")
+			return nodes;
+
+		bool inline = false;
+		for (int i = 0; i < nodes.Length; i++){
+			if (IsInlineElement (nodes [i])) {
+				inline = true;
+			} else {
+				if (inline) {
+					var result = new List<XNode> ();
+					var container = new XElement  ("para");
+					int j = 0;
+					for (; j < i; j++)
+						container.Add (nodes [j]);
+					result.Add (container);
+					for (; j < nodes.Length; j++){
+						result.Add (nodes [j]);
+					}
+					return result.ToArray ();
+				}
+			}
+		}
+		return nodes;
 	}
 
 	static XElement ParseList (HtmlNode node, string kind)
@@ -197,7 +260,7 @@ static class XmlToEcma {
 
 				switch (child.Name) {
 				case "a":
-					xp.Add (new XElement ("see", new XAttribute ("cref", child.Attributes ["href"].Value)));
+					xp.Add (new XElement ("see", new XAttribute ("cref", child.InnerText)));
 					break;
 				case "img":
 					xp.Add (new XElement ("img", new XAttribute ("href", child.Attributes ["src"].Value)));
@@ -283,10 +346,16 @@ static class XmlToEcma {
 				else if (child.Name == "div") {
 					var _edclass = child.Attributes ["class"];
 					var edclass = _edclass == null ? null : _edclass.Value;
-					if (edclass != null && !(edclass.StartsWith ("lang-") || edclass== "example-body"))
+					if (edclass != null && !(edclass.StartsWith ("lang-") || edclass.IndexOf ("example-body") != -1 || edclass.IndexOf ("example-title") != -1))
 						throw new UnsupportedElementException ("Do not know how to handle a div whose class does not start with lang- inside an <div class='example'>");
-					if (edclass != "skip")
-						example.Add (ParseDiv (child));
+					if (edclass.IndexOf ("skip") == -1) {
+						if (edclass == "example-body") {
+							foreach (var ebchild in child.ChildNodes) {
+								example.Add (ParseDiv (ebchild));
+							} 
+						} else
+							example.Add (ParseDiv (child));
+					}
 				} else
 					throw new UnsupportedElementException ("Do not know how to handled non-div elements inside <example>");
 			}
@@ -316,7 +385,9 @@ static class XmlToEcma {
 			}
 		} else if (dclass == "cdata") {
 			yield return new XCData (HttpUtility.HtmlDecode (node.InnerText));
-		} else
+		} else if (dclass.StartsWith ("skip ") || dclass == "skip") {
+			// nothing, ignore
+		} else 
 			throw new UnsupportedElementException ("Unknown div style: " + dclass);
 	}
 
@@ -346,7 +417,7 @@ class EcmaToXml {
 		bool seenPara = false;
 		bool first = true;
 		bool renderedText = false;
-		int nodeCount = root.Nodes ().Count ();
+
 		foreach (var node in root.Nodes ()) {
 			if (node is XText){
 				if (first) {
@@ -374,7 +445,7 @@ class EcmaToXml {
 				switch (el.Name.ToString ()) {
 				case "para":
 					seenPara = true;
-					if (renderedText)
+					if (renderedText) 
 						WarningDangling (root, node);
 					string attr = "";
 					var toola = el.Attribute ("tool");
@@ -577,7 +648,7 @@ class EcmaToXml {
 	{
 		var target = xel.Attribute ("cref");
 		if (target != null)
-			return string.Format ("<a href='{0}'>{0}</a>", target.Value);
+			return string.Format ("<a href=''>{0}</a>", target.Value);
 		var lang = xel.Attribute ("langword").Value;
 		return string.Format ("<code class='langword'>{0}</code>", lang);
 	}
@@ -616,7 +687,8 @@ class EcmaToXml {
 
 	string RenderCode (XElement code)
 	{
-		var lang = code.Attribute ("lang").Value.Replace ("#", "sharp");
+		var blang = code.Attribute ("lang").Value;
+		var lang = blang.Replace ("#", "sharp");
 		if (lang == "")
 			throw new UnsupportedElementException ("No language specified for <code> tag inside example");
 		int count = code.Nodes ().Count ();
@@ -636,7 +708,7 @@ class EcmaToXml {
 				value = child.ToString ();
 		} else
 			value = "";
-		return "<div class='lang-" + lang + "'" + cdata + ">" + value + "</div>";
+		return "<div class='skip language lang-" + lang + "' contenteditable='false'>// Language " + blang + "</div><div class='lang-" + lang + "'" + cdata + ">" + value + "</div>";
 	}
 
 	string Verbatim (IEnumerable<XNode> nodes)

@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">101000</int>
-		<string key="IBDocument.SystemVersion">13D65</string>
+		<string key="IBDocument.SystemVersion">14A314h</string>
 		<string key="IBDocument.InterfaceBuilderVersion">6205</string>
-		<string key="IBDocument.AppKitVersion">1265.20</string>
-		<string key="IBDocument.HIToolboxVersion">698.00</string>
+		<string key="IBDocument.AppKitVersion">1328.11</string>
+		<string key="IBDocument.HIToolboxVersion">745.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">6205</string>
@@ -414,8 +414,8 @@
 								<object class="NSMenuItem" id="1000333189">
 									<reference key="NSMenu" ref="789758025"/>
 									<string key="NSTitle">Insert C# Code Block</string>
-									<string key="NSKeyEquiv">c</string>
-									<int key="NSKeyEquivModMask">524288</int>
+									<string key="NSKeyEquiv">C</string>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="35465992"/>
 									<reference key="NSMixedImage" ref="502551668"/>
@@ -432,8 +432,8 @@
 								<object class="NSMenuItem" id="1008380198">
 									<reference key="NSMenu" ref="789758025"/>
 									<string key="NSTitle">Insert F# Code Block</string>
-									<string key="NSKeyEquiv">f</string>
-									<int key="NSKeyEquivModMask">524288</int>
+									<string key="NSKeyEquiv">F</string>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="35465992"/>
 									<reference key="NSMixedImage" ref="502551668"/>
@@ -3658,13 +3658,23 @@
 					<string key="className">AppDelegate</string>
 					<string key="superclassName">NSObject</string>
 					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="insertCode:">id</string>
 						<string key="insertExample:">id</string>
+						<string key="insertFCode:">id</string>
 						<string key="insertFExample:">id</string>
 						<string key="insertReference:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="insertCode:">
+							<string key="name">insertCode:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="insertExample:">
 							<string key="name">insertExample:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="insertFCode:">
+							<string key="name">insertFCode:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="insertFExample:">
@@ -3743,8 +3753,8 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NSMenuCheckmark">{11, 11}</string>
-			<string key="NSMenuMixedState">{10, 3}</string>
+			<string key="NSMenuCheckmark">{12, 12}</string>
+			<string key="NSMenuMixedState">{10, 2}</string>
 		</dictionary>
 	</data>
 </archive>

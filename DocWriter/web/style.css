@@ -23,7 +23,7 @@
 
 .lang-Csharp, .lang-Fsharp, .lang-CSharp, .lang-FSharp {
 	white-space: pre;
-	font-family: monospace, Consolas, Courier;
+	padding-bottom:5px;
 }
 
 .caption {
@@ -35,7 +35,6 @@
 .example {
 	background-color: #eee;
 	border-width: 1px;
-	border-color:#5686e5;
 	border-style: solid;
 }
 
@@ -45,10 +44,23 @@
 	padding: 5px
 }
 
+.codeblock {
+	border-width: 1px;
+	border-style: solid;
+	border-color:#999;
+	font-family: monospace, Consolas, Courier;
+	background-color: white;
+}
+
 .example-body {
 	padding: 5px;
 }
 
+.code-label {
+	color: #eee;
+	background-color: #999;
+	padding: 5px;
+}
 
 .parameter-name {
 	font-style: italic;
@@ -60,8 +72,4 @@
 
 table, td, tr {
 	border: 1px solid black;
-}
-
-.language {
-	color: #999;
 }

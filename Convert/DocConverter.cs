@@ -353,6 +353,9 @@ static class XmlToEcma {
 							foreach (var ebchild in child.ChildNodes) {
 								example.Add (ParseDiv (ebchild));
 							} 
+						} else if (edclass == "codeblock") {
+							foreach (var cc in child.ChildNodes)
+								example.Add (ParseDiv (cc));
 						} else
 							example.Add (ParseDiv (child));
 					}
@@ -387,7 +390,12 @@ static class XmlToEcma {
 			yield return new XCData (HttpUtility.HtmlDecode (node.InnerText));
 		} else if (dclass.StartsWith ("skip ") || dclass == "skip") {
 			// nothing, ignore
-		} else 
+		} else if (dclass == "codeblock") {
+			foreach (var ncn in node.ChildNodes) {
+				foreach (var r in ParseDiv (ncn))
+					yield return r;
+			}
+		} else
 			throw new UnsupportedElementException ("Unknown div style: " + dclass);
 	}
 
@@ -708,7 +716,7 @@ class EcmaToXml {
 				value = child.ToString ();
 		} else
 			value = "";
-		return "<div class='skip language lang-" + lang + "' contenteditable='false'>// Language " + blang + "</div><div class='lang-" + lang + "'" + cdata + ">" + value + "</div>";
+		return "<div class='codeblock'><div class='skip code-label' contenteditable='false'>// Language " + blang + "</div><div class='lang-" + lang + "'" + cdata + ">" + value + "</div>";
 	}
 
 	string Verbatim (IEnumerable<XNode> nodes)

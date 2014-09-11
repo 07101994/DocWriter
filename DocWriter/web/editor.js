@@ -7,7 +7,7 @@ dirty = {}
 // This should insert a-span like HTML inside the stuff we are adding
 //	
 function insertSpanAtCursor(html){
-	sel = window.getSelection ()
+	sel = window.getSelection ();
     if (sel.type == "Caret") {    	
         range = sel.getRangeAt(0);
         range.deleteContents();
@@ -71,10 +71,40 @@ function trackDirty (node)
     }, false);
 }
 
+function inTable ()
+{
+    sel = window.getSelection ();
+
+    for (node = sel.focusNode; node; node = node.parentNode){
+    console.log ("node: " + node + " and  " + node.nodeValue);
+    	console.log ("node: " + node.nodeName);
+    	if ($(node).hasClass ("edit")){
+    	console.log ("Got an edit");
+    		return false;
+    	} 
+    	if (node.nodeName == "TABLE")
+			return true;
+		if (!node.parentNode)
+console.log ("Got a null parent");
+    }
+    return false;
+}
+function keypressHandler (event)
+{
+    console.log (event.which)
+    ee = event;
+    if (event.which == 13){
+    	if (inTable ()){
+    		
+        }
+    }
+}
+
 $(document).ready(function(){
    $(".edit").each (function (idx, element){ 
       trackDirty (element.id);
    });
+   $(".edit").on ("keypress", keypressHandler);
 });
 
 function getDirtyNodes ()
@@ -100,3 +130,4 @@ function postOk (nodeId)
 	n.html ("");
 	n.removeClass ("perror");
 }
+

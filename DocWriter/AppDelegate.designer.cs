@@ -1,4 +1,4 @@
-﻿// WARNING
+// WARNING
 //
 // This file has been generated automatically by Xamarin Studio to store outlets and
 // actions made in the UI designer. If it is removed, they will be lost.
@@ -24,8 +24,14 @@ namespace DocWriter
 		[Action ("insertFExample:")]
 		partial void insertFExample (MonoMac.Foundation.NSObject sender);
 
+		[Action ("insertList:")]
+		partial void insertList (MonoMac.Foundation.NSObject sender);
+
 		[Action ("insertReference:")]
 		partial void insertReference (MonoMac.Foundation.NSObject sender);
+
+		[Action ("insertTable:")]
+		partial void insertTable (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{

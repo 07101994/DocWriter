@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
+using System.Text;
 
 namespace DocWriter
 {
@@ -110,14 +111,27 @@ namespace DocWriter
 			webView.MainFrame.LoadHtmlString (ihtml.Render (), NSBundle.MainBundle.ResourceUrl);
 		}
 
+		static string EscapeHtml (string html)
+		{
+			var sb = new StringBuilder ();
+
+			foreach (char c in html) {
+				if (c == '\n')
+					sb.Append ("\\\n");
+				else
+					sb.Append (c);
+			}
+			return sb.ToString ();
+		}
+
 		public void InsertSpan (string html)
 		{
-			webView.StringByEvaluatingJavaScriptFromString ("insertSpanAtCursor(\"" + html + "\")");
+			webView.StringByEvaluatingJavaScriptFromString ("insertSpanAtCursor(\"" + EscapeHtml (html) + "\")");
 		}
 
 		public void AppendNodeHtml (string html)
 		{
-			webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAfterCurrentNode(\"" + html + "\")");
+			webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAfterCurrentNode(\"" + EscapeHtml (html) + "\")");
 		}
 
 		class DocumentTreeDelegate : NSOutlineViewDelegate {

@@ -78,6 +78,34 @@ namespace DocWriter
 			mainWindowController.Window.SaveCurrentObject ();
 		}
 
+		[Export ("insertList:")]
+		void InsertList (NSObject sender)
+		{
+			var list = new XElement ("list", new XAttribute ("type", "bullet"),
+				           new XElement ("item", new XElement ("term", new XText ("Text1"))),
+				           new XElement ("item", new XElement ("term", new XText ("Text2"))));
+				
+			AppendNodeHtml (DocConverter.ToHtml (new XElement ("host", list), ""));
+		}
+
+		[Export ("insertTable:")]
+		void InsertTable (NSObject sender)
+		{
+			var table = new XElement ("list", new XAttribute ("type", "table"),
+				           new XElement ("listheader", 
+					           new XElement ("term", new XText ("Term")),
+					           new XElement ("description", new XText ("Description"))),
+				           new XElement ("item", 
+					           new XElement ("term", new XText ("Term1")),
+					           new XElement ("description", new XText ("Description1"))),
+				           new XElement ("item", 
+					           new XElement ("term", new XText ("Term2")),
+					           new XElement ("description", new XText ("Description2"))));
+
+			string a = DocConverter.ToHtml (new XElement ("Host", table), "");
+			AppendNodeHtml (a);
+		}
+
 		public override void WillTerminate (NSNotification notification)
 		{
 			mainWindowController.Window.SaveCurrentObject ();

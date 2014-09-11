@@ -77,6 +77,11 @@ namespace DocWriter
 		{
 			mainWindowController.Window.SaveCurrentObject ();
 		}
+
+		public override void WillTerminate (NSNotification notification)
+		{
+			mainWindowController.Window.SaveCurrentObject ();
+		}
 	}
 }
 

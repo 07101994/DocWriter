@@ -114,7 +114,9 @@ static class XmlToEcma {
 			case "img":
 				yield return new XElement ("img", new XAttribute ("href", element.Attributes ["src"].Value));
 				break;
-
+			case "br":
+				yield return new XElement ("para");
+				break;
 			default:
 				if (element is HtmlTextNode) {
 					yield return new XText (HttpUtility.HtmlDecode ((element as HtmlTextNode).Text));
@@ -716,7 +718,7 @@ class EcmaToXml {
 				value = child.ToString ();
 		} else
 			value = "";
-		return "<div class='codeblock'><div class='skip code-label' contenteditable='false'>// Language " + blang + "</div><div class='lang-" + lang + "'" + cdata + ">" + value + "</div>";
+		return "<div class='codeblock'><div class='skip code-label' contenteditable='false'>// Language " + blang + "</div><div class='lang-" + lang + "'" + cdata + ">" + value + "</div></div>";
 	}
 
 	string Verbatim (IEnumerable<XNode> nodes)

@@ -15,6 +15,7 @@ using System.Xml.XPath;
 using MonoMac.Foundation;
 using System.Xml;
 using System.Text;
+using System.Web;
 
 namespace DocWriter
 {
@@ -25,15 +26,16 @@ namespace DocWriter
 	}
 
 	// Interface implemented to lookup the contents of a node
-	public interface ILookup {
+	public interface IWebView {
 		string Fetch (string id);
+		string Run (string code);
 	}
 
 
 	// Interface implemented by nodes that can provide editing functionality
 	interface IEditableNode {
-		string ValidateChanges (ILookup lookup);
-		bool Save (ILookup lookup, out string error);
+		string ValidateChanges (IWebView webView, string [] nodes);
+		bool Save (IWebView webView, out string error);
 	}
 
 	// It is an NSObject, because we conveniently stash these in the NSOutlineView
@@ -54,14 +56,14 @@ namespace DocWriter
 		// are converted back to XML which is stashed in the target specified by xpath.
 		//
 		// Returns true on success
-		public bool UpdateNode (ILookup lookup, XElement target, string xpath, string htmlElement, out string error)
+		public bool UpdateNode (IWebView webView, XElement target, string xpath, string htmlElement, out string error)
 		{
 			error = null;
 			var node = target.XPathSelectElement (xpath);
 			node.RemoveAll ();
 
 			try {
-				var str = lookup.Fetch (htmlElement);
+				var str = webView.Fetch (htmlElement);
 				foreach (var ret in DocConverter.ToXml (str, canonical: true))
 					node.Add (ret);
 			} catch (UnsupportedElementException e){
@@ -76,13 +78,15 @@ namespace DocWriter
 		//
 		// Returns null on success, otherwise a string with the error details
 		//
-		public string ValidateElements (ILookup lookup, params string [] args)
+		public string ValidateElements (IWebView web, params string [] args)
 		{
 			foreach (var arg in args) {
 				try {
-					var str = lookup.Fetch (arg);
+					var str = web.Fetch (arg);
 					DocConverter.ToXml (str, canonical: true);
+					web.Run ("postOk('" + arg + "')");
 				} catch (UnsupportedElementException e){
+					web.Run ("postError('" + arg + "')");
 					return "Parsing error: " + e.Message;
 				} catch (StackOverflowException e){
 					return "Exception " + e.GetType ().ToString ();
@@ -95,7 +99,7 @@ namespace DocWriter
 	// DocMember: renders an ECMA type member (methods, properties, properties, fields)
 	public class DocMember : DocNode, IHtmlRender, IEditableNode {
 		public DocType Type { get; private set; }
-		XElement e;
+		public XElement MemberElement;
 		public IEnumerable<XElement> Params;
 		public XElement ReturnValue;
 		public XElement Remarks;
@@ -104,7 +108,7 @@ namespace DocWriter
 		public DocMember (DocType type, XElement e)
 		{
 			this.Type = type;
-			this.e = e;
+			this.MemberElement = e;
 			Name = new NSString (e.Attribute ("MemberName").Value);
 			Remarks = e.XPathSelectElement ("Docs/remarks");
 			Params = e.XPathSelectElements ("Docs/params");
@@ -118,57 +122,62 @@ namespace DocWriter
 			return ret;
 		}
 
+		public string SummaryHtml {
+			get {
+				return GetHtml (MemberElement, "Docs/summary");
+			}
+		}
+
+		public string SignatureHtml {
+			get {
+				return HttpUtility.HtmlEncode (MemberElement.XPathSelectElement ("MemberSignature").Attribute ("Value").Value);
+			}
+		}
+
 		public string GetHtml (string xpath)
 		{
-			return GetHtml (e, xpath);
+			return GetHtml (MemberElement, xpath);
 		}
 			
-		public string ValidateChanges (ILookup lookup)
+		public string ValidateChanges (IWebView webView, string [] nodes)
 		{
-			var err = ValidateElements (lookup, "summary", "remarks");
+			var err = ValidateElements (webView, nodes);
 			if (err != null)
 				return err;
-			if (ReturnValue != null)
-				err = ValidateElements (lookup, "return");
-			if (err != null)
-				return err;
-			if (Params != null) {
-				foreach (var p in Params) {
-					string name = "param-" + p.Attribute ("name");
-					err = ValidateElements (lookup, name);
-					if (err != null)
-						return err;
-				}
-			}
 			return null;
 		}
 
-		public bool Save (ILookup lookup, out string error)
+		public bool Save (IWebView webView, out string error)
 		{
 			error = null;
-			if (!UpdateNode (lookup, e, "Docs/summary", "summary", out error))
+			if (!UpdateNode (webView, MemberElement, "Docs/summary", "summary", out error))
 				return false;
-			if (Remarks != null && !UpdateNode (lookup, e, "Docs/remarks", "remarks", out error))
+			if (Remarks != null && !UpdateNode (webView, MemberElement, "Docs/remarks", "remarks", out error))
 				return false;
-			if (ReturnValue != null && !UpdateNode (lookup, e, "Docs/value", "return", out error))
+			if (ReturnValue != null && !UpdateNode (webView, MemberElement, "Docs/value", "return", out error))
 				return false;
 			if (Params != null) {
 				foreach (var p in Params) {
 					string name = "param-" + p.Attribute ("name");
-					if (!UpdateNode (lookup, e, ".", name, out error))
+					if (!UpdateNode (webView, MemberElement, ".", name, out error))
 						return false;
 				}
 			}
 			return Type.SaveDoc (out error);
-			return true;
 		}
 
 	}
 
 	// DocType: renders an ECMA type
 	public class DocType : DocNode, IHtmlRender, IEditableNode {
-		XDocument doc;
 		public DocNamespace Namespace { get; private set; }
+		public XElement Root;
+
+		// Keeps track of altered nodes in the summaries
+		Dictionary<string,string> dirtyNodes = new Dictionary<string, string>();
+
+		// The contents of the XML document, as read from disk
+		XDocument doc;
 		XElement [] xml_members;
 		DocMember [] members;
 		string path;
@@ -180,6 +189,7 @@ namespace DocWriter
 			Name = new NSString (Path.GetFileNameWithoutExtension (path));
 			try {
 				doc = XDocument.Load (path);
+				Root = doc.Root;
 				xml_members = doc.XPathSelectElements ("/Type/Members/Member").ToArray ();
 				members = new DocMember[xml_members.Length];
 			} catch {
@@ -208,20 +218,28 @@ namespace DocWriter
 
 		public string SummaryHtml {
 			get {
-				return GetHtml (doc.Root, "/Type/Docs/summary");
+				return GetHtml (Root, "/Type/Docs/summary");
 			}
 		}
 
 		public string RemarksHtml {
 			get {
-				var x =  GetHtml (doc.Root, "/Type/Docs/remarks");
+				var x =  GetHtml (Root, "/Type/Docs/remarks");
 				return x;
 			}
 		}
 
-		public string ValidateChanges (ILookup lookup)
+		public string ValidateChanges (IWebView webView, string [] nodes)
 		{
-			return ValidateElements (lookup, "summary", "remarks");
+			var ret = ValidateElements (webView, nodes);
+			if (ret != null)
+				return ret;
+			foreach (var n in nodes) {
+				if (dirtyNodes.ContainsKey (n))
+					continue;
+				dirtyNodes [n] = n;
+			}
+			return null;
 		}
 
 		public bool SaveDoc (out string error)
@@ -247,21 +265,38 @@ namespace DocWriter
 			}
 		}
 
-		public bool Save (ILookup lookup, out string error)
+		public bool Save (IWebView webView, out string error)
 		{
-			if (UpdateNode (lookup, doc.Root, "/Type/Docs/summary", "summary", out error) &&
-			    UpdateNode (lookup, doc.Root, "/Type/Docs/remarks", "remarks", out error)) {
+			error = null;
+			if (UpdateNode (webView, Root, "/Type/Docs/summary", "summary", out error) &&
+			    UpdateNode (webView, Root, "/Type/Docs/remarks", "remarks", out error)) {
+
+				foreach (var dirty in dirtyNodes.Keys) {
+					if (dirty.StartsWith ("summary-")) {
+						int idx;
+						if (Int32.TryParse (dirty.Substring (8), out idx)) {
+							var node = this [idx];
+							if (!node.UpdateNode (webView, this [idx].MemberElement, "Docs/summary", dirty, out error))
+								return false;
+						} else {
+							throw new Exception ("You introduced a new summary-XX id that we can not save");
+						}
+					}
+				}
+				dirtyNodes.Clear ();
 
 				if (SaveDoc (out error))
 					return true;
 				error = "Error while saving the XML file to " + path;
 			}
+
 			return false;
 		}
 	}
 
 	// Provides a host to show the namespace on the tree.
-	public class DocNamespace : DocNode {
+	public class DocNamespace : DocNode, IHtmlRender, IEditableNode {
+		Dictionary<string,string> dirtyNodes = new Dictionary<string, string>();
 		SortedList<string,DocType> docs = new SortedList<string, DocType> ();
 		string path;
 
@@ -287,6 +322,47 @@ namespace DocWriter
 				}
 				return docs.Values [idx];
 			}
+		}
+
+		public string Render ()
+		{
+			var ret = new NamespaceTemplate () { Model = this }.GenerateString ();
+			return ret;
+		}
+
+		public string ValidateChanges (IWebView webView, string[] nodes)
+		{			
+			var ret = ValidateElements (webView, nodes);
+			if (ret != null)
+				return ret;
+			foreach (var n in nodes) {
+				if (dirtyNodes.ContainsKey (n))
+					continue;
+				dirtyNodes [n] = n;
+			}
+			return null;
+		}
+
+		public bool Save (IWebView webView, out string error)
+		{
+			error = null;
+			foreach (var dirty in dirtyNodes.Keys) {
+				if (dirty.StartsWith ("summary-")) {
+					int idx;
+					if (Int32.TryParse (dirty.Substring (8), out idx)) {
+						var node = this [idx];
+						if (!node.UpdateNode (webView, node.Root,"/Type/Docs/summary", dirty, out error))
+							return false;
+						Console.WriteLine ("SAVING NODE {0}", node.Name);
+						if (!node.SaveDoc (out error))
+							return false;
+					} else {
+						throw new Exception ("You introduced a new summary-XX id that we can not save");
+					}
+				}
+			}
+			dirtyNodes.Clear ();
+			return true;
 		}
 	}
 
@@ -317,6 +393,8 @@ namespace DocWriter
 				return namespaces [idx];
 			}
 		}
+
+
 	}
 }
 

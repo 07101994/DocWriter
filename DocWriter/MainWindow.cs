@@ -16,7 +16,7 @@ using MonoMac.AppKit;
 
 namespace DocWriter
 {
-	public partial class MainWindow : MonoMac.AppKit.NSWindow, ILookup
+	public partial class MainWindow : MonoMac.AppKit.NSWindow, IWebView
 	{
 		DocModel docModel;
 
@@ -47,9 +47,17 @@ namespace DocWriter
 			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
 		}
 	
-		string ILookup.Fetch (string id)
+		public string Run (string code)
 		{
-			var element = webView.StringByEvaluatingJavaScriptFromString ("getHtml(\"" + id + "\")");
+			return webView.StringByEvaluatingJavaScriptFromString (code);
+		}
+
+		public string Fetch (string id)
+		{
+			var element = Run ("getHtml(\"" + id + "\")");
+			if (element.StartsWith ("<<<<")) {
+				Console.WriteLine ("Failure to fetch contents of {0}", id);
+			}
 			return element;
 		}
 
@@ -57,11 +65,15 @@ namespace DocWriter
 
 		void CheckContents ()
 		{
+			var dirtyNodes = Run ("getDirtyNodes ()").Split (new char [] {' '}, StringSplitOptions.RemoveEmptyEntries);
+			if (dirtyNodes.Length == 0)
+				return;
+
 			if (currentObject != null && currentObject is IEditableNode) {
 				string result;
 
 				try {
-					result = (currentObject as IEditableNode).ValidateChanges (this);
+					result = (currentObject as IEditableNode).ValidateChanges (this, dirtyNodes);
 				} catch (Exception e){
 					result = e.ToString ();
 				}

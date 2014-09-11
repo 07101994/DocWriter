@@ -72,6 +72,7 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="web\" />
+    <Folder Include="HtmlTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -85,31 +86,44 @@
       <DependentUpon>AppDelegate.cs</DependentUpon>
     </Compile>
     <Compile Include="DocModel.cs" />
-    <Compile Include="TypeTemplate.cs">
-      <DependentUpon>TypeTemplate.cshtml</DependentUpon>
-    </Compile>
     <Compile Include="..\Convert\DocConverter.cs">
       <Link>DocConverter.cs</Link>
     </Compile>
-    <Compile Include="MemberTemplate.cs">
+    <Compile Include="MemberEntry.cs" />
+    <Compile Include="MemberEntryController.cs" />
+    <Compile Include="MemberEntry.designer.cs">
+      <DependentUpon>MemberEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="HtmlTemplates\TypeTemplate.cs">
+      <DependentUpon>TypeTemplate.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="HtmlTemplates\MemberTemplate.cs">
       <DependentUpon>MemberTemplate.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="HtmlTemplates\NamespaceTemplate.cs">
+      <DependentUpon>NamespaceTemplate.cshtml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
     <InterfaceDefinition Include="MainMenu.xib" />
+    <InterfaceDefinition Include="MemberEntry.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="packages.config" />
-    <None Include="MemberTemplate.cshtml">
+    <None Include="HtmlTemplates\MemberTemplate.cshtml">
       <Generator>RazorTemplatePreprocessor</Generator>
       <LastGenOutput>MemberTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="HtmlTemplates\NamespaceTemplate.cshtml">
+      <Generator>RazorTemplatePreprocessor</Generator>
+      <LastGenOutput>NamespaceTemplate.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <AtlasTexture Include="TypeTemplate.cshtml">
+    <AtlasTexture Include="HtmlTemplates\TypeTemplate.cshtml">
       <Generator>RazorTemplatePreprocessor</Generator>
       <LastGenOutput>TypeTemplate.cs</LastGenOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

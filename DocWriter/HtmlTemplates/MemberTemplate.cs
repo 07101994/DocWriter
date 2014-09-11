@@ -34,11 +34,11 @@ public override void Execute()
 {
 WriteLiteral("<html>\n<head>\n  <script");
 
-WriteLiteral(" src=\"web/editor.js\"");
+WriteLiteral(" src=\"http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"");
 
 WriteLiteral("></script>\n  <script");
 
-WriteLiteral(" src=\"http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"");
+WriteLiteral(" src=\"web/editor.js\"");
 
 WriteLiteral("></script>\n  <link");
 
@@ -94,7 +94,11 @@ WriteLiteral(">");
 
 #line default
 #line hidden
-WriteLiteral("</div>\n");
+WriteLiteral(" <span");
+
+WriteLiteral(" id=\"summary-status\"");
+
+WriteLiteral("></span></div>\n");
 
 
 #line 15 "MemberTemplate.cshtml"
@@ -136,7 +140,19 @@ WriteLiteral(">");
 
 #line default
 #line hidden
-WriteLiteral("</div>\n");
+WriteLiteral("<span");
+
+WriteAttribute ("id", " id=\"", "\""
+
+#line 19 "MemberTemplate.cshtml"
+          , Tuple.Create<string,object,bool> ("", paramid
+
+#line default
+#line hidden
+, false)
+, Tuple.Create<string,object,bool> ("", "-status", true)
+);
+WriteLiteral("></span></div>\n");
 
 WriteLiteral("  \t   <div");
 
@@ -190,7 +206,11 @@ WriteLiteral("     <div");
 
 WriteLiteral(" class=\"title\"");
 
-WriteLiteral(">Return Value:</div>\n");
+WriteLiteral(">Return Value:<span");
+
+WriteLiteral(" id=\"return-status\"");
+
+WriteLiteral("></span></div>\n");
 
 WriteLiteral("     <div");
 
@@ -236,7 +256,11 @@ WriteLiteral("\t  <div");
 
 WriteLiteral(" class=\"title\"");
 
-WriteLiteral(">Remarks:</div>\n");
+WriteLiteral(">Remarks:<span");
+
+WriteLiteral(" id=\"remarks-status\"");
+
+WriteLiteral("></span></div>\n");
 
 WriteLiteral("\t  <div");
 

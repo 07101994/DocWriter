@@ -1,0 +1,24 @@
+﻿@model DocType
+<html>
+<head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="web/editor.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="web/style.css">
+
+</head>
+<body>
+  <div class="caption">@Model.Name</div>
+  <div class="title">Summary:<span id="summary-status"></span></div>
+  <div class='edit' id='summary' contenteditable='true'>@{WriteLiteral (Model.SummaryHtml);}</div>
+  <div class="title">Remarks:<span id="remarks-status"></span></div>
+  <div class="edit" id='remarks' contenteditable='true'>@{WriteLiteral (Model.RemarksHtml);}</div>
+  <div class='caption'>Members</div>
+  @for (int n = 0; n < Model.NodeCount; n++){
+  	<div class="title title-code">@Model[n].SignatureHtml<span id="summary-@n-status"></span></div>
+  	<div class="edit" id="summary-@n" contenteditable='true'>@{WriteLiteral (Model [n].SummaryHtml);}</div>
+  }
+
+
+</body>
+</html>

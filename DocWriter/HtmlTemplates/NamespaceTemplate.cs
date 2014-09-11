@@ -18,13 +18,13 @@ using System.Text;
 
 
 [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorTemplatePreprocessor", "2.6.0.0")]
-public partial class TypeTemplate : TypeTemplateBase
+public partial class NamespaceTemplate : NamespaceTemplateBase
 {
 
 #line hidden
 
-#line 1 "TypeTemplate.cshtml"
-public DocType Model { get; set; }
+#line 1 "NamespaceTemplate.cshtml"
+public DocNamespace Model { get; set; }
 
 #line default
 #line hidden
@@ -34,13 +34,13 @@ public override void Execute()
 {
 WriteLiteral("<html>\n<head>\n  <script");
 
-WriteLiteral(" src=\"web/editor.js\"");
+WriteLiteral(" src=\"http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"");
 
 WriteLiteral("></script>\n  <script");
 
-WriteLiteral(" src=\"http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"");
+WriteLiteral(" src=\"web/editor.js\"");
 
-WriteLiteral("></script>\n  <link");
+WriteLiteral("></script>\n\n  <link");
 
 WriteLiteral(" rel=\"stylesheet\"");
 
@@ -55,53 +55,89 @@ WriteLiteral(" class=\"caption\"");
 WriteLiteral(">");
 
 
-#line 10 "TypeTemplate.cshtml"
+#line 11 "NamespaceTemplate.cshtml"
                   Write(Model.Name);
 
 
 #line default
 #line hidden
-WriteLiteral("</div>\n  <div");
+WriteLiteral("</div>\n");
+
+
+#line 12 "NamespaceTemplate.cshtml"
+  
+
+#line default
+#line hidden
+
+#line 12 "NamespaceTemplate.cshtml"
+   for (int n = 0; n < Model.NodeCount; n++){
+
+
+#line default
+#line hidden
+WriteLiteral("  \t<div");
 
 WriteLiteral(" class=\"title\"");
-
-WriteLiteral(">Summary:</div>\n  <div");
-
-WriteLiteral(" class=\'edit\'");
-
-WriteLiteral(" id=\'summary\'");
-
-WriteLiteral(" contenteditable=\'true\'");
 
 WriteLiteral(">");
 
 
-#line 12 "TypeTemplate.cshtml"
-                                                          WriteLiteral (Model.SummaryHtml);
+#line 13 "NamespaceTemplate.cshtml"
+                 Write(Model[n].Name);
+
 
 #line default
 #line hidden
-WriteLiteral("</div>\n  <div");
+WriteLiteral("<span");
 
-WriteLiteral(" class=\"title\"");
+WriteAttribute ("id", " id=\"", "\""
+, Tuple.Create<string,object,bool> ("", "summary-", true)
 
-WriteLiteral(">Remarks:</div>\n  <div");
+#line 13 "NamespaceTemplate.cshtml"
+               , Tuple.Create<string,object,bool> ("", n
+
+#line default
+#line hidden
+, false)
+, Tuple.Create<string,object,bool> ("", "-status", true)
+);
+WriteLiteral("></span></div>\n");
+
+WriteLiteral("  \t<div");
 
 WriteLiteral(" class=\"edit\"");
 
-WriteLiteral(" id=\'remarks\'");
+WriteAttribute ("id", " id=\"", "\""
+, Tuple.Create<string,object,bool> ("", "summary-", true)
 
+#line 14 "NamespaceTemplate.cshtml"
+, Tuple.Create<string,object,bool> ("", n
+
+#line default
+#line hidden
+, false)
+);
 WriteLiteral(" contenteditable=\'true\'");
 
 WriteLiteral(">");
 
 
-#line 14 "TypeTemplate.cshtml"
-                                                          WriteLiteral (Model.RemarksHtml);
+#line 14 "NamespaceTemplate.cshtml"
+                                                              WriteLiteral (Model [n].SummaryHtml);
 
 #line default
 #line hidden
-WriteLiteral("</div>\n</body>\n</html>");
+WriteLiteral("</div>\n");
+
+
+#line 15 "NamespaceTemplate.cshtml"
+  }
+
+
+#line default
+#line hidden
+WriteLiteral("</body>\n</html>");
 
 }
 }
@@ -109,7 +145,7 @@ WriteLiteral("</div>\n</body>\n</html>");
 // NOTE: this is the default generated helper class. You may choose to extract it to a separate file 
 // in order to customize it or share it between multiple templates, and specify the template's base 
 // class via the @inherits directive.
-public abstract class TypeTemplateBase
+public abstract class NamespaceTemplateBase
 {
 
 		// This field is OPTIONAL, but used by the default implementation of Generate, Write, WriteAttribute and WriteLiteral

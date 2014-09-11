@@ -1,3 +1,7 @@
+// 
+// List of modified elements
+//
+dirty = {}
 
 //
 // This should insert a-span like HTML inside the stuff we are adding
@@ -51,7 +55,48 @@ function getHtml(xid)
     	return "<>Odd";
     element = document.getElementById (xid);
 	if (element === null)
-		return "<>It is null and id=" + xid;
+		return "<<<<It is null and id=" + xid;
 
     return element.innerHTML;
+}
+
+// Tracks changes on a content editable node whose name is 'node'
+// and stores the id of the node on chages in the dirty dictionary
+function trackDirty (node)
+{
+    var domNode = document.getElementById (node);
+    domNode.addEventListener ("input", function () {
+	    dirty [domNode.id] = domNode.id;
+        console.log ("Logging dirty " + domNode.id);
+    }, false);
+}
+
+$(document).ready(function(){
+   $(".edit").each (function (idx, element){ 
+      trackDirty (element.id);
+   });
+});
+
+function getDirtyNodes ()
+{
+   var r = ""; 
+   for (var k in dirty) 
+       r = k + " " + r;
+   dirty = {};
+	return r;
+}
+
+function postError (nodeId)
+{
+	var n = $("#" + nodeId + "-status");
+
+	n.html ("Parse Error");
+	n.addClass ("perror");
+}
+
+function postOk (nodeId)
+{
+	n = $("#" + nodeId + "-status");
+	n.html ("");
+	n.removeClass ("perror");
 }

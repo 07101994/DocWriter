@@ -1,0 +1,17 @@
+﻿@model DocNamespace
+<html>
+<head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="web/editor.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="web/style.css">
+
+</head>
+<body>
+  <div class="caption">@Model.Name</div>
+  @for (int n = 0; n < Model.NodeCount; n++){
+  	<div class="title">@Model[n].Name<span id="summary-@n-status"></span></div>
+  	<div class="edit" id="summary-@n" contenteditable='true'>@{WriteLiteral (Model [n].SummaryHtml);}</div>
+  }
+</body>
+</html>

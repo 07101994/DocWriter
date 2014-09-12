@@ -120,7 +120,7 @@ namespace DocWriter
 			this.MemberElement = e;
 			Name = new NSString (e.Attribute ("MemberName").Value);
 			Remarks = e.XPathSelectElement ("Docs/remarks");
-			Params = e.XPathSelectElements ("Docs/params");
+			Params = e.XPathSelectElements ("Docs/param");
 			ReturnValue = e.XPathSelectElement ("Docs/value");
 			Kind = e.XPathSelectElement ("MemberType").Value;
 		}

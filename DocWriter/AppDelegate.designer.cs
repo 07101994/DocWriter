@@ -32,6 +32,9 @@ namespace DocWriter
 
 		[Action ("insertTable:")]
 		partial void insertTable (MonoMac.Foundation.NSObject sender);
+
+		[Action ("insertUrl:")]
+		partial void insertUrl (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{

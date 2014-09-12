@@ -40,8 +40,17 @@ namespace DocWriter
 
 	// It is an NSObject, because we conveniently stash these in the NSOutlineView
 	public class DocNode : NSObject {
+		public string CName;
+
 		// This is an NSString because we use it as a value that we store in a NSOutlineView
-		public NSString Name { get; internal set; }
+		NSString _name;
+		public NSString Name { 
+			get { return _name; }
+			set {
+				_name = value;
+				CName = value.ToString ();
+			}
+		}
 
 		public string GetHtml (XElement element, string xpath)
 		{
@@ -373,9 +382,11 @@ namespace DocWriter
 
 		public DocModel (string path = "/cvs/mt/ios-api-docs/en")
 		{
-			var dirs = from p in Directory.GetDirectories (path)
-			           orderby p
-			           select p;
+			var dirs = 
+				from p in Directory.GetDirectories (path)
+				orderby p
+					where Path.GetFileName (p) != "Mono.Options"
+				select p;
 
 			foreach (var dir in dirs) {
 				namespaces.Add (new DocNamespace (dir));

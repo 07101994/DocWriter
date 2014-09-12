@@ -76,26 +76,58 @@ function inTable ()
     sel = window.getSelection ();
 
     for (node = sel.focusNode; node; node = node.parentNode){
-    console.log ("node: " + node + " and  " + node.nodeValue);
-    	console.log ("node: " + node.nodeName);
     	if ($(node).hasClass ("edit")){
-    	console.log ("Got an edit");
     		return false;
     	} 
     	if (node.nodeName == "TABLE")
 			return true;
-		if (!node.parentNode)
-console.log ("Got a null parent");
     }
     return false;
 }
+
+function moveCursorTo (node,event)
+{
+    var sel = document.getSelection ();
+    var range = document.createRange ();
+    range.setStart (node, 0);
+    range.collapse (true);
+    sel.removeAllRanges ();
+    sel.addRange (range);
+	event.preventDefault();
+	event.stopPropagation();
+}
+
 function keypressHandler (event)
 {
     console.log (event.which)
     ee = event;
+
+    //
+    // On return, inside tables, we move from cell to cell, and at the end, we add more cells on demand
+    //
     if (event.which == 13){
     	if (inTable ()){
-    		
+    		var sel = document.getSelection ();
+    		var n = sel.focusNode;
+    		inHeader = $(n).closest ("th");
+    		if (inHeader.length > 0){
+    			if (inHeader.next ().length == 1){
+    				moveCursorTo (inHeader.next ()[0], event);
+    			} else {
+					moveCursorTo (inHeader.parent ().next ().children ()[0], event);
+				}
+    		} else {
+	    		next = $(n).closest ("td").next ("td");
+	    		if (next.length > 0){
+	    			moveCursorTo (next[0], event);
+	    		} else {
+					// right side of the table.
+					if ($(n).closest ("tr").next ().length == 0)
+						$($(n).closest ("td")[0].parentNode).after ("<tr><td>foo</td><td>bar</td></tr>");
+					
+					moveCursorTo ($(n).closest ("tr").next ().children ()[0], event);
+				}
+			}
         }
     }
 }

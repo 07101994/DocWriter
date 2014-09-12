@@ -34,6 +34,12 @@ namespace DocWriter
 			mainWindowController.Window.InsertSpan (html);
 		}
 
+		public DocModel DocModel {
+			get {
+				return mainWindowController.Window.DocModel;
+			}
+		}
+
 		[Export ("insertExample:")]
 		void InsertExample (NSObject sender)
 		{
@@ -66,10 +72,23 @@ namespace DocWriter
 			AppendNodeHtml (DocConverter.ToHtml (example, ""));
 		}
 
+		MemberEntryController mec;
 		[Export ("insertReference:")]
 		void InsertReference (NSObject sender)
 		{
+			#if false
+			// Work in progress
+			if (mec == null)
+				mec = new MemberEntryController (this);
+			mec.ShowWindow (this);
+			#else
 			InsertHtml ("<a href=''>T:Type.Name</a>");
+			#endif
+		}
+
+		public void InsertReference (string text)
+		{
+			InsertHtml ("<a href=''>" + text + "</a>");
 		}
 
 		[Export ("saveDocument:")]
@@ -86,6 +105,16 @@ namespace DocWriter
 				           new XElement ("item", new XElement ("term", new XText ("Text2"))));
 				
 			AppendNodeHtml (DocConverter.ToHtml (new XElement ("host", list), ""));
+		}
+
+		[Export("insertUrl:")]
+		void InsertUrl (NSObject sender)
+		{
+			string url = "http://www.xamarin.com";
+			string caption = "Xamarin";
+				
+			InsertHtml (string.Format ("<div class='verbatim'><a href='{0}'>{1}</a></div>", url, caption));
+
 		}
 
 		[Export ("insertTable:")]

@@ -23,10 +23,13 @@ namespace DocWriter
 		{
 			Initialize ();
 		}
-		
+
+		internal AppDelegate appDelegate;
+
 		// Call to load from the XIB/NIB file
-		public MemberEntryController () : base ("MemberEntry")
+		public MemberEntryController (AppDelegate appDelegate) : base ("MemberEntry")
 		{
+			this.appDelegate = appDelegate;
 			Initialize ();
 		}
 		

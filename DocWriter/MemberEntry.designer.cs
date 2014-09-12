@@ -13,32 +13,27 @@ namespace DocWriter
 	partial class MemberEntry
 	{
 		[Outlet]
-		MonoMac.AppKit.NSButton cancel { get; set; }
-
-		[Outlet]
 		MonoMac.AppKit.NSTableView tableView { get; set; }
 
 		[Outlet]
 		MonoMac.AppKit.NSTextField textField { get; set; }
+
+		[Action ("cancel:")]
+		partial void cancel (MonoMac.Foundation.NSObject sender);
 
 		[Action ("ok:")]
 		partial void ok (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (cancel != null) {
-				cancel.Dispose ();
-				cancel = null;
+			if (tableView != null) {
+				tableView.Dispose ();
+				tableView = null;
 			}
 
 			if (textField != null) {
 				textField.Dispose ();
 				textField = null;
-			}
-
-			if (tableView != null) {
-				tableView.Dispose ();
-				tableView = null;
 			}
 		}
 	}

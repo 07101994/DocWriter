@@ -19,7 +19,7 @@ namespace DocWriter
 {
 	public partial class MainWindow : MonoMac.AppKit.NSWindow, IWebView
 	{
-		DocModel docModel;
+		public DocModel DocModel;
 
 		// Called when created from unmanaged code
 		public MainWindow (IntPtr handle) : base (handle)
@@ -37,13 +37,13 @@ namespace DocWriter
 		// Shared initialization code
 		void Initialize ()
 		{
-			docModel = new DocModel ();
+			DocModel = new DocModel ();
 		}
 
 		public override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
-			outline.DataSource = new DocumentTreeDataSource (docModel);
+			outline.DataSource = new DocumentTreeDataSource (DocModel);
 			outline.Delegate = new DocumentTreeDelegate (this);
 			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
 		}

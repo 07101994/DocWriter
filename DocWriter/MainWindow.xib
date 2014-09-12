@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6205" systemVersion="13D65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6205" systemVersion="13E28" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment defaultVersion="101000" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6205"/>
@@ -118,39 +118,23 @@
                             <real value="250"/>
                         </holdingPriorities>
                     </splitView>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LM2-8f-9ve">
-                        <rect key="frame" x="13" y="733" width="94" height="17"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Lookup8" id="Yja-MN-3en">
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LM2-8f-9ve">
+                        <rect key="frame" x="13" y="733" width="4" height="17"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="Yja-MN-3en">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zny-3v-Wui">
-                        <rect key="frame" x="625" y="731" width="432" height="22"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="432" id="c1Q-58-bL9"/>
-                        </constraints>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="m9T-3o-RkJ">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="7" secondAttribute="bottom" id="Ew1-Bt-kJ8"/>
-                    <constraint firstItem="zny-3v-Wui" firstAttribute="leading" secondItem="LM2-8f-9ve" secondAttribute="trailing" constant="3" id="IAP-FW-PAG"/>
                     <constraint firstItem="7" firstAttribute="leading" secondItem="3" secondAttribute="leading" id="Jw8-B1-IaI"/>
                     <constraint firstAttribute="trailing" secondItem="7" secondAttribute="trailing" id="LjJ-2w-a2R"/>
                     <constraint firstItem="7" firstAttribute="top" secondItem="3" secondAttribute="top" constant="40" id="OMs-pC-Ogo"/>
-                    <constraint firstItem="zny-3v-Wui" firstAttribute="baseline" secondItem="LM2-8f-9ve" secondAttribute="baseline" id="PLA-rY-QIX"/>
-                    <constraint firstAttribute="trailing" secondItem="zny-3v-Wui" secondAttribute="trailing" constant="66" id="PeP-so-YJH"/>
-                    <constraint firstItem="7" firstAttribute="top" secondItem="zny-3v-Wui" secondAttribute="bottom" constant="11" id="oB4-xo-rNd"/>
                 </constraints>
             </view>
             <connections>
-                <outlet property="lookupEntry" destination="zny-3v-Wui" id="MXl-Eg-V5i"/>
                 <outlet property="outline" destination="CuP-wK-Qwv" id="d2L-7H-czz"/>
                 <outlet property="statusLabel" destination="qrK-bH-ra2" id="c7c-3F-Bt9"/>
                 <outlet property="webView" destination="ua7-iQ-BTW" id="vfs-Lf-zwG"/>

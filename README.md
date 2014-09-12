@@ -32,24 +32,14 @@ Commands:
 - [x] Insert bullet list
 - [ ] Insert HTTP url (done, need UI to enter the Link/Caption for URL links)
 
-Focus Next cell
-==============
+Big Ideas
+=========
 
-Use this to find the next cell:
+Perhaps we could host more than one Web View, host couple of side web
+views that would dynamically get the contents from Googling on
+StackOverflow side-by-side.
 
-    $(sel.focusNode).closest ("td").next ("td")
-
-Use this to set the focus:
-
-    dom = $(s).get (0)
-    sel.setStart (dom, 0);
-    sel.setEnd (dom, 0);
-    .. do the rest of the dance
-
-Use this to add a row:
-
-$($(sel.focusNode).closest ("td")[0].parentNode).after ("<tr><td>foo</td><td>bar</td></tr>")
-
+Perhaps show the source code for the binding for a particular API.
 
 Tests
 =====

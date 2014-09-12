@@ -69,7 +69,7 @@ namespace DocWriter
 		{
 			error = null;
 			var node = target.XPathSelectElement (xpath);
-			node.RemoveAll ();
+			node.RemoveNodes ();
 
 			try {
 				var str = webView.Fetch (htmlElement);
@@ -167,8 +167,8 @@ namespace DocWriter
 				return false;
 			if (Params != null) {
 				foreach (var p in Params) {
-					string name = "param-" + p.Attribute ("name");
-					if (!UpdateNode (webView, MemberElement, ".", name, out error))
+					string name = "param-" + p.Attribute ("name").Value;
+					if (!UpdateNode (webView, p, ".", name, out error))
 						return false;
 				}
 			}

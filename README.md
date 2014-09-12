@@ -32,6 +32,14 @@ Commands:
 - [x] Insert bullet list
 - [ ] Insert HTTP url (done, need UI to enter the Link/Caption for URL links)
 
+Bugs
+====
+
+Inserting an Example after an Example nests the example. (Command-E twice)
+
+It is not possible to add text after an Example.  Perhaps we need to
+insert a spare div to allow editing after an example.
+
 Big Ideas
 =========
 

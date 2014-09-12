@@ -329,7 +329,7 @@ static class XmlToEcma {
 	static IEnumerable<XNode> ParseDiv (HtmlNode node)
 	{
 		var classAttr = node.Attributes ["class"];
-		var dclass = classAttr == null ? null : classAttr.Value;
+		var dclass = classAttr == null ? "" : classAttr.Value;
 
 		if (dclass.StartsWith ("lang-")) {
 			var code = new XElement ("code", new XAttribute ("lang", dclass.Substring (5).Replace ("sharp", "#")));
@@ -394,7 +394,7 @@ static class XmlToEcma {
 			yield return new XCData (HttpUtility.HtmlDecode (node.InnerText));
 		} else if (dclass.StartsWith ("skip ") || dclass == "skip") {
 			// nothing, ignore
-		} else if (dclass == "codeblock" || dclass == null) {
+		} else if (dclass == "codeblock" || dclass == "") {
 			foreach (var ncn in node.ChildNodes) {
 				foreach (var r in ParseDiv (ncn))
 					yield return r;

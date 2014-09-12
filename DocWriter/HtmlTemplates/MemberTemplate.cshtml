@@ -9,9 +9,10 @@
 <body>
   <div class="caption">@Model.Name<br>
 	  <div style="font-size:80%;">@Model.Kind</div>
+	  <div style="font-size:80%;" class="title-code">@Model.SignatureHtml</div>
   </div>
-  <div class="title">Summary:</div>
-  <div class='edit' id='summary' contenteditable='true'>@{WriteLiteral (Model.GetHtml ("Docs/summary"));} <span id="summary-status"></span></div>
+  <div class="title">Summary: <span id="summary-status"></span></div>
+  <div class='edit' id='summary' contenteditable='true'>@{WriteLiteral (Model.GetHtml ("Docs/summary"));}</div>
   @if (Model.Params.Count () > 0){
     <div class="title">Parameters:</div>
   	foreach (var p in Model.Params){ 

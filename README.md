@@ -22,8 +22,10 @@ TODO:
 - [ ] Allow documentation to be loaded from another location
 - [X] Render parse errors as part of the HTML (add a div that we can use to inject errors/colors on parse errors, so that the message is shown in the correct context (specially important for long lists).
 - [ ] Namespace functionality editing
+- [ ] Support for editing delegates 
 
 Commands:
+- [ ] Hot key to insert common elements that might be referenced from the current item.   On a class, those might be members for example, on a member, those could be parameters.
 - [x] Insert Table
 - [x] Insert row to table
 - [ ] Add Column

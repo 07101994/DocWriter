@@ -67,6 +67,11 @@ function trackDirty (node)
     var domNode = document.getElementById (node);
     domNode.addEventListener ("input", function () {
 	    dirty [domNode.id] = domNode.id;
+	    if ($(domNode).html () == "To be added."){
+	    	$(domNode).addClass ("to-be-added");
+	    } else {
+			$(domNode).removeClass ("to-be-added");
+		}
         console.log ("Logging dirty " + domNode.id);
     }, false);
 }
@@ -135,10 +140,14 @@ function keypressHandler (event)
 $(document).ready(function(){
    $(".edit").each (function (idx, element){ 
       trackDirty (element.id);
+      if ($(element).html () == "To be added."){
+	    	$(element).addClass ("to-be-added");
+      }
    });
    $(".edit").on ("keypress", keypressHandler);
 });
 
+// Returns a space separate list of nodes that have been modified by the user
 function getDirtyNodes ()
 {
    var r = ""; 
@@ -148,6 +157,7 @@ function getDirtyNodes ()
 	return r;
 }
 
+// Annodates a nodeId-status with a parse error, used to signal parsing problems in a content editable
 function postError (nodeId)
 {
 	var n = $("#" + nodeId + "-status");
@@ -155,7 +165,7 @@ function postError (nodeId)
 	n.html ("Parse Error");
 	n.addClass ("perror");
 }
-
+// Annodates a nodeId-status with a clean bill of health, parsing-wise
 function postOk (nodeId)
 {
 	n = $("#" + nodeId + "-status");

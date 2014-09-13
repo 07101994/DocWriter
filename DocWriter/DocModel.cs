@@ -225,6 +225,33 @@ namespace DocWriter
 			return ret;
 		}
 
+		public string KindHtml {
+			get {
+				var x = doc.XPathSelectElement ("/Type/Base/BaseTypeName");
+				if (x == null)
+					return "interface";
+
+				switch (x.Value) {
+				case "System.Enum":
+					return "enum";
+				case "System.ValueType":
+					return "struct";
+				case "System.Delegate":
+					return "delegate";
+				default:
+					return "class";
+				}
+			}
+		}
+
+		public string ToBeAddedClass {
+			get {
+				if (Root.XPathSelectElement ("/Type/Docs/summary").Value == "To be added.")
+					return "to-be-added";
+				return "";
+			}
+		}
+
 		public string SummaryHtml {
 			get {
 				return GetHtml (Root, "/Type/Docs/summary");

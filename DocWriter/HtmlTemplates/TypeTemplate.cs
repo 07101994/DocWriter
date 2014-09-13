@@ -85,7 +85,102 @@ WriteLiteral(">");
 
 #line default
 #line hidden
-WriteLiteral("</div>\n  <div");
+WriteLiteral("</div>\n");
+
+
+#line 14 "TypeTemplate.cshtml"
+  
+
+#line default
+#line hidden
+
+#line 14 "TypeTemplate.cshtml"
+   if (Model.Params.Count () > 0){
+
+
+#line default
+#line hidden
+WriteLiteral("    <div");
+
+WriteLiteral(" class=\"title\"");
+
+WriteLiteral(">Parameters:</div>\n");
+
+
+#line 16 "TypeTemplate.cshtml"
+  	foreach (var p in Model.Params){ 
+  	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
+
+
+#line default
+#line hidden
+WriteLiteral("  \t   <div");
+
+WriteLiteral(" class=\"parameter-name\"");
+
+WriteLiteral(">");
+
+
+#line 18 "TypeTemplate.cshtml"
+                             Write(name);
+
+
+#line default
+#line hidden
+WriteLiteral("<span");
+
+WriteAttribute ("id", " id=\"", "\""
+
+#line 18 "TypeTemplate.cshtml"
+          , Tuple.Create<string,object,bool> ("", paramid
+
+#line default
+#line hidden
+, false)
+, Tuple.Create<string,object,bool> ("", "-status", true)
+);
+WriteLiteral("></span></div>\n");
+
+WriteLiteral("  \t   <div");
+
+WriteLiteral(" class=\"edit parameter-doc\"");
+
+WriteLiteral(" contenteditable=\'true\'");
+
+WriteAttribute ("id", " id=\"", "\""
+
+#line 19 "TypeTemplate.cshtml"
+                          , Tuple.Create<string,object,bool> ("", paramid
+
+#line default
+#line hidden
+, false)
+);
+WriteLiteral(">\n");
+
+
+#line 20 "TypeTemplate.cshtml"
+  	   
+
+#line default
+#line hidden
+
+#line 20 "TypeTemplate.cshtml"
+        WriteLiteral (DocConverter.ToHtml (p,""));
+
+#line default
+#line hidden
+WriteLiteral("\n  \t   </div>\n");
+
+
+#line 22 "TypeTemplate.cshtml"
+  	}
+  }
+
+
+#line default
+#line hidden
+WriteLiteral("  <div");
 
 WriteLiteral(" class=\"title\"");
 
@@ -104,7 +199,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 15 "TypeTemplate.cshtml"
+#line 25 "TypeTemplate.cshtml"
                                                           WriteLiteral (Model.RemarksHtml);
 
 #line default
@@ -116,13 +211,13 @@ WriteLiteral(" class=\'caption\'");
 WriteLiteral(">Members</div>\n");
 
 
-#line 17 "TypeTemplate.cshtml"
+#line 27 "TypeTemplate.cshtml"
   
 
 #line default
 #line hidden
 
-#line 17 "TypeTemplate.cshtml"
+#line 27 "TypeTemplate.cshtml"
    for (int n = 0; n < Model.NodeCount; n++){
 
 
@@ -135,7 +230,7 @@ WriteLiteral(" class=\"title title-code\"");
 WriteLiteral(">");
 
 
-#line 18 "TypeTemplate.cshtml"
+#line 28 "TypeTemplate.cshtml"
                             Write(Model[n].SignatureHtml);
 
 
@@ -146,7 +241,7 @@ WriteLiteral("<span");
 WriteAttribute ("id", " id=\"", "\""
 , Tuple.Create<string,object,bool> ("", "summary-", true)
 
-#line 18 "TypeTemplate.cshtml"
+#line 28 "TypeTemplate.cshtml"
                                    , Tuple.Create<string,object,bool> ("", n
 
 #line default
@@ -163,7 +258,7 @@ WriteLiteral(" class=\"edit\"");
 WriteAttribute ("id", " id=\"", "\""
 , Tuple.Create<string,object,bool> ("", "summary-", true)
 
-#line 19 "TypeTemplate.cshtml"
+#line 29 "TypeTemplate.cshtml"
 , Tuple.Create<string,object,bool> ("", n
 
 #line default
@@ -175,7 +270,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 19 "TypeTemplate.cshtml"
+#line 29 "TypeTemplate.cshtml"
                                                               WriteLiteral (Model [n].SummaryHtml);
 
 #line default
@@ -183,7 +278,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 20 "TypeTemplate.cshtml"
+#line 30 "TypeTemplate.cshtml"
   }
 
 

@@ -23,6 +23,10 @@ TODO:
 - [X] Render parse errors as part of the HTML (add a div that we can use to inject errors/colors on parse errors, so that the message is shown in the correct context (specially important for long lists).
 - [ ] Namespace functionality editing
 - [ ] Support for editing delegates 
+- [ ] Handle clicks on links
+- [ ] Implement back/forward history
+- [ ] Search bar at the top
+- [ ] Make members clickable, so you can navigate to the contents of that particular node
 
 Commands:
 - [ ] Hot key to insert common elements that might be referenced from the current item.   On a class, those might be members for example, on a member, those could be parameters.
@@ -93,3 +97,14 @@ Wanted:
 
 - [ ] Flag members that are auto-documented as such, to now waste documenters time on it.
 
+
+Handle Clicks on Links
+======================
+
+We could navigate to that page, 
+
+
+Search Bar
+==========
+
+Linked to Command-L, as you type, it finds the member on the right side?

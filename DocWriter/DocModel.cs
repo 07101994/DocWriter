@@ -180,6 +180,7 @@ namespace DocWriter
 	// DocType: renders an ECMA type
 	public class DocType : DocNode, IHtmlRender, IEditableNode {
 		public DocNamespace Namespace { get; private set; }
+		public IEnumerable<XElement> Params;
 		public XElement Root;
 
 		// Keeps track of altered nodes in the summaries
@@ -200,6 +201,7 @@ namespace DocWriter
 				doc = XDocument.Load (path);
 				Root = doc.Root;
 				xml_members = doc.XPathSelectElements ("/Type/Members/Member").ToArray ();
+				Params = doc.XPathSelectElements ("/Type/Docs/param");
 				members = new DocMember[xml_members.Length];
 			} catch {
 			}
@@ -319,6 +321,14 @@ namespace DocWriter
 						}
 					}
 				}
+				if (Params != null) {
+					foreach (var p in Params) {
+						string name = "param-" + p.Attribute ("name").Value;
+						if (!UpdateNode (webView, p, ".", name, out error))
+							return false;
+					}
+				}
+
 				dirtyNodes.Clear ();
 
 				if (SaveDoc (out error))

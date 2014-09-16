@@ -395,10 +395,30 @@ static class XmlToEcma {
 		} else if (dclass.StartsWith ("skip ") || dclass == "skip") {
 			// nothing, ignore
 		} else if (dclass == "codeblock" || dclass == "") {
+			var parsed = new List<XNode> ();
 			foreach (var ncn in node.ChildNodes) {
 				foreach (var r in ParseDiv (ncn))
-					yield return r;
+					parsed.Add (r);
 			}
+			var ret = new List<XNode> ();
+			XElement last = null;
+			for (int i = 0; i < parsed.Count; i++) {
+				var n = parsed [i];
+				var ne = n as XElement;
+				if (ne != null) {
+					if (last != null) {
+						last.Add (new XText ("\n"));
+						last.Add (ne.FirstNode);
+					} else {
+						last = ne;
+						ret.Add (ne);
+					}
+				} else {
+					ret.Add (n);
+				}
+			}
+			foreach (var e in ret)
+				yield return e;
 		} else
 			throw new UnsupportedElementException ("Unknown div style: " + dclass);
 	}
@@ -716,8 +736,15 @@ class EcmaToXml {
 			if (child is XCData) {
 				cdata = " data-cdata='true'";
 				value = HttpUtility.HtmlEncode ((child as XCData).Value);
-			} else
-				value = child.ToString ();
+			} else {
+				var sb = new StringBuilder ();
+				foreach (var c in code.Nodes ()) {
+					if (c is XText) {
+						sb.Append ((c as XText).Value);
+					}
+				}
+				value = sb.ToString ();
+			}
 		} else
 			value = "";
 		return "<div class='codeblock'><div class='skip code-label' contenteditable='false'>// Language " + blang + "</div><div class='lang-" + lang + "'" + cdata + ">" + value + "</div></div>";

@@ -27,6 +27,11 @@ TODO:
 - [ ] Implement back/forward history
 - [ ] Search bar at the top
 - [ ] Make members clickable, so you can navigate to the contents of that particular node
+- [ ] Ability to insert <see paramref=""/>
+- [ ] Collapse multiple divs in content
+- [ ] Disable formatting on paste (from console for example, we get lots of colors).
+- [ ] Sometimes this is inserting a ton of newline space in the docs, not sure why
+- [ ] Need to collapse <divs> inside code that are added naturally by the contenteditable
 
 Commands:
 - [ ] Hot key to insert common elements that might be referenced from the current item.   On a class, those might be members for example, on a member, those could be parameters.

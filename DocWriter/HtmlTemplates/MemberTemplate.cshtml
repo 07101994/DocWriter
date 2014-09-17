@@ -18,22 +18,16 @@
   	foreach (var p in Model.Params){ 
   	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
   	   <div class="parameter-name">@name<span id="@paramid-status"></span></div>
-  	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">
-  	   @{WriteLiteral (DocConverter.ToHtml (p,""));}
-  	   </div>
+  	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">@{WriteLiteral (DocConverter.ToHtml (p,""));}</div>
   	}
   }
   @if (Model.Value != null){
      <div class="title">Return Value:<span id="value-status"></span></div>
-     <div class="edit value" contenteditable='true' id='value'>
-     @{WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));}
-     </div>
+     <div class="edit value" contenteditable='true' id='value'>@{WriteLiteral (DocConverter.ToHtml (Model.Value,""));}</div>
   }
   @if (Model.ReturnValue != null){
      <div class="title">Return Value:<span id="return-status"></span></div>
-     <div class="edit return" contenteditable='true' id='return'>
-     @{WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));}
-     </div>
+     <div class="edit return" contenteditable='true' id='return'>@{WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));}</div>
   }
   @if (Model.Remarks != null){
 	  <div class="title">Remarks:<span id="remarks-status"></span></div>

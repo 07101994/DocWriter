@@ -184,24 +184,18 @@ WriteAttribute ("id", " id=\"", "\""
 #line hidden
 , false)
 );
-WriteLiteral(">\n");
+WriteLiteral(">");
 
 
-#line 22 "MemberTemplate.cshtml"
-  	   
-
-#line default
-#line hidden
-
-#line 22 "MemberTemplate.cshtml"
-        WriteLiteral (DocConverter.ToHtml (p,""));
+#line 21 "MemberTemplate.cshtml"
+                                                                             WriteLiteral (DocConverter.ToHtml (p,""));
 
 #line default
 #line hidden
-WriteLiteral("\n  \t   </div>\n");
+WriteLiteral("</div>\n");
 
 
-#line 24 "MemberTemplate.cshtml"
+#line 22 "MemberTemplate.cshtml"
   	}
   }
 
@@ -211,7 +205,7 @@ WriteLiteral("\n  \t   </div>\n");
 WriteLiteral("  ");
 
 
-#line 26 "MemberTemplate.cshtml"
+#line 24 "MemberTemplate.cshtml"
    if (Model.Value != null){
 
 
@@ -235,24 +229,18 @@ WriteLiteral(" contenteditable=\'true\'");
 
 WriteLiteral(" id=\'value\'");
 
-WriteLiteral(">\n");
+WriteLiteral(">");
 
 
-#line 29 "MemberTemplate.cshtml"
-     
-
-#line default
-#line hidden
-
-#line 29 "MemberTemplate.cshtml"
-       WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));
+#line 26 "MemberTemplate.cshtml"
+                                                                 WriteLiteral (DocConverter.ToHtml (Model.Value,""));
 
 #line default
 #line hidden
-WriteLiteral("\n     </div>\n");
+WriteLiteral("</div>\n");
 
 
-#line 31 "MemberTemplate.cshtml"
+#line 27 "MemberTemplate.cshtml"
   }
 
 
@@ -261,7 +249,7 @@ WriteLiteral("\n     </div>\n");
 WriteLiteral("  ");
 
 
-#line 32 "MemberTemplate.cshtml"
+#line 28 "MemberTemplate.cshtml"
    if (Model.ReturnValue != null){
 
 
@@ -285,24 +273,18 @@ WriteLiteral(" contenteditable=\'true\'");
 
 WriteLiteral(" id=\'return\'");
 
-WriteLiteral(">\n");
+WriteLiteral(">");
 
 
-#line 35 "MemberTemplate.cshtml"
-     
-
-#line default
-#line hidden
-
-#line 35 "MemberTemplate.cshtml"
-       WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));
+#line 30 "MemberTemplate.cshtml"
+                                                                   WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));
 
 #line default
 #line hidden
-WriteLiteral("\n     </div>\n");
+WriteLiteral("</div>\n");
 
 
-#line 37 "MemberTemplate.cshtml"
+#line 31 "MemberTemplate.cshtml"
   }
 
 
@@ -311,7 +293,7 @@ WriteLiteral("\n     </div>\n");
 WriteLiteral("  ");
 
 
-#line 38 "MemberTemplate.cshtml"
+#line 32 "MemberTemplate.cshtml"
    if (Model.Remarks != null){
 
 
@@ -338,7 +320,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 40 "MemberTemplate.cshtml"
+#line 34 "MemberTemplate.cshtml"
                                                            WriteLiteral (Model.GetHtml ("Docs/remarks"));
 
 #line default
@@ -346,7 +328,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 41 "MemberTemplate.cshtml"
+#line 35 "MemberTemplate.cshtml"
   }
 
 

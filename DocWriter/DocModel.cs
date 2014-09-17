@@ -103,6 +103,13 @@ namespace DocWriter
 			}
 			return null;
 		}
+
+		// Returns this node path, useful on the IDe to remember which node to reload
+		public virtual string DocPath {
+			get {
+				return "";
+			}
+		}
 	}
 
 	// DocMember: renders an ECMA type member (methods, properties, properties, fields)
@@ -179,6 +186,11 @@ namespace DocWriter
 			return Type.SaveDoc (out error);
 		}
 
+		public override string DocPath {
+			get {
+				return Type.DocPath + "/" + CName;
+			}
+		}
 	}
 
 	// DocType: renders an ECMA type
@@ -342,6 +354,11 @@ namespace DocWriter
 
 			return false;
 		}
+		public override string DocPath {
+			get {
+				return Namespace.DocPath + "/" + CName;
+			}
+		}
 	}
 
 	// Provides a host to show the namespace on the tree.
@@ -413,6 +430,12 @@ namespace DocWriter
 			}
 			dirtyNodes.Clear ();
 			return true;
+		}
+
+		public override string DocPath {
+			get {
+				return CName;
+			}
 		}
 	}
 

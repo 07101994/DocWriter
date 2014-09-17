@@ -20,6 +20,7 @@ namespace DocWriter
 	public partial class MainWindow : MonoMac.AppKit.NSWindow, IWebView
 	{
 		public DocModel DocModel;
+		bool loading;
 
 		// Called when created from unmanaged code
 		public MainWindow (IntPtr handle) : base (handle)
@@ -45,9 +46,63 @@ namespace DocWriter
 			base.AwakeFromNib ();
 			outline.DataSource = new DocumentTreeDataSource (DocModel);
 			outline.Delegate = new DocumentTreeDelegate (this);
+
+			// Restore the last node
+			var lastOpenedNode = NSUserDefaults.StandardUserDefaults.StringForKey ("currentNode");
+			if (lastOpenedNode != null) {
+				int nsidx = -1;
+				int typeidx = -1;
+				var components = lastOpenedNode.Split ('/');
+				if (components.Length > 0)
+					nsidx = SelectNamespace (components [0]);
+				if (components.Length > 1) 
+					typeidx = SelectType (nsidx, components [1]);
+				if (components.Length > 2)
+					SelectMember (nsidx, typeidx, components [2]);
+			}
+
 			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
 		}
 	
+		int SelectNamespace (string name)
+		{
+			for (int n = DocModel.NodeCount, i = 0; i < n; i++) {
+				if (DocModel [i].CName == name) {
+					outline.SelectRow (i, false);
+					return i;
+				}
+			}
+			return 0;
+		}
+
+		int SelectType (int nsidx, string type)
+		{
+			DocNamespace ns = DocModel [nsidx];
+			outline.ExpandItem (ns);
+			for (int n = ns.NodeCount, i = 0; i < n; i++){
+				if (ns [i].CName == type) {
+					var r = outline.RowForItem (ns [i]);
+					outline.SelectRow (r, false);
+					return i;
+				}
+			}
+			return 0;
+		}
+
+		void SelectMember (int nsidx, int typeidx, string name)
+		{
+			DocType type = DocModel [nsidx][typeidx];
+			outline.ExpandItem (type);
+			for (int n = type.NodeCount, i = 0; i < n; i++){
+				if (type [i].CName == name) {
+					var r = outline.RowForItem (type [i]);
+					outline.SelectRow (r, false);
+					return;
+				}
+			}
+		}
+
+
 		public string RunJS (string code)
 		{
 			return webView.StringByEvaluatingJavaScriptFromString (code);
@@ -121,6 +176,11 @@ namespace DocWriter
 			currentObject = null;
 
 			currentObject = outline.ItemAtRow (outline.SelectedRow);
+			var docNode = currentObject as DocNode;
+			if (docNode != null) {
+				NSUserDefaults.StandardUserDefaults.SetString (docNode.DocPath, "currentNode");
+			}
+
 			var ihtml = currentObject as IHtmlRender;
 			if (ihtml == null)
 				return;

@@ -57,7 +57,8 @@ public static class DocConverter {
 	/// <param name="currentFile">Message hint used when reporting warnings.</param>
 	public static string ToHtml (XElement rootNode, string currentFile)
 	{
-		return new EcmaToXml (currentFile).Convert (rootNode);
+		var ret = new EcmaToXml (currentFile).Convert (rootNode);
+		return ret;
 	}
 }
 

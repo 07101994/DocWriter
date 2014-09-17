@@ -28,7 +28,7 @@ namespace DocWriter
 	// Interface implemented to lookup the contents of a node
 	public interface IWebView {
 		string Fetch (string id);
-		string Run (string code);
+		string RunJS (string code);
 	}
 
 
@@ -93,9 +93,9 @@ namespace DocWriter
 				try {
 					var str = web.Fetch (arg);
 					DocConverter.ToXml (str, canonical: true);
-					web.Run ("postOk('" + arg + "')");
+					web.RunJS ("postOk('" + arg + "')");
 				} catch (UnsupportedElementException e){
-					web.Run ("postError('" + arg + "')");
+					web.RunJS ("postError('" + arg + "')");
 					return "Parsing error: " + e.Message;
 				} catch (StackOverflowException e){
 					return "Exception " + e.GetType ().ToString ();

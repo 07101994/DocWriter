@@ -35,6 +35,15 @@ namespace DocWriter
 
 		[Action ("insertUrl:")]
 		partial void insertUrl (MonoMac.Foundation.NSObject sender);
+
+		[Action ("selectionToLang:")]
+		partial void selectionToLang (MonoMac.Foundation.NSObject sender);
+
+		[Action ("selectionToParam:")]
+		partial void selectionToParam (MonoMac.Foundation.NSObject sender);
+
+		[Action ("selectionToType:")]
+		partial void selectionToType (MonoMac.Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{

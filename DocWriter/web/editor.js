@@ -1,12 +1,23 @@
+
 // 
 // List of modified elements
 //
 dirty = {}
 
+function track(element)
+{
+    var edit = $(element).closest (".edit");
+	if (edit.length > 0){
+	    dirty [edit [0].id] = edit [0].id;
+	    console.log ("Dirty: " + edit [0].id);
+    }
+}
+
 //
 // This should insert a-span like HTML inside the stuff we are adding
 //	
-function insertSpanAtCursor(html){
+function insertSpanAtCursor(html)
+{
 	sel = window.getSelection ();
     if (sel.type == "Caret") {    	
         range = sel.getRangeAt(0);
@@ -21,7 +32,22 @@ function insertSpanAtCursor(html){
         range2.collapse (true);
         sel.removeAllRanges ();
         sel.addRange (range2);
+        track (range.startContainer);
     }
+}
+
+//
+function selectionToCode(cname)
+{
+	sel = window.getSelection ();
+    if (sel.type == "Range") {    	
+        range = sel.getRangeAt(0);
+	    var c = document.createElement ("code");
+		$(c).addClass (cname);
+
+        range.surroundContents (c);
+        track (range.startContainer);
+	}
 }
 
 // Use this to add stuff after the current node, for example to
@@ -46,6 +72,7 @@ function insertHtmlAfterCurrentNode (html)
         }
         range = sel.getRangeAt(0);
         appendon.appendChild (range.createContextualFragment (html));
+        track (appendon);
     }
 }
 

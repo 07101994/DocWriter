@@ -48,14 +48,14 @@ namespace DocWriter
 			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
 		}
 	
-		public string Run (string code)
+		public string RunJS (string code)
 		{
 			return webView.StringByEvaluatingJavaScriptFromString (code);
 		}
 
 		public string Fetch (string id)
 		{
-			var element = Run ("getHtml(\"" + id + "\")");
+			var element = RunJS ("getHtml(\"" + id + "\")");
 			if (element.StartsWith ("<<<<")) {
 				Console.WriteLine ("Failure to fetch contents of {0}", id);
 			}
@@ -66,7 +66,7 @@ namespace DocWriter
 
 		void CheckContents ()
 		{
-			var dirtyNodes = Run ("getDirtyNodes ()").Split (new char [] {' '}, StringSplitOptions.RemoveEmptyEntries);
+			var dirtyNodes = RunJS ("getDirtyNodes ()").Split (new char [] {' '}, StringSplitOptions.RemoveEmptyEntries);
 			if (dirtyNodes.Length == 0)
 				return;
 
@@ -92,10 +92,27 @@ namespace DocWriter
 			if (editable != null) {
 				string error;
 
+				CheckContents ();
+
 				if (!editable.Save (this, out error)) {
 					// FIXME: popup a window or something.
 				}
 			}
+		}
+
+		// Suggests a name for the reference based on the current context
+		public string SuggestTypeRef ()
+		{
+			var cns = currentObject as DocNamespace;
+			if (cns != null)
+				return cns.Name;
+			var ctype = currentObject as DocType;
+			if (ctype != null)
+				return ctype.Namespace.Name + "." + ctype.Name;
+			var cm = currentObject as DocMember;
+			if (cm != null)
+				return cm.Type.Namespace.Name + "." + cm.Type.Name;
+			return "MonoTouch.";
 		}
 
 		void SelectionChanged ()

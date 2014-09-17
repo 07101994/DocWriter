@@ -29,9 +29,9 @@ namespace DocWriter
 			mainWindowController.Window.AppendNodeHtml (html);
 		}
 
-		void InsertHtml (string html)
+		void InsertHtml (string html, params object [] args)
 		{
-			mainWindowController.Window.InsertSpan (html);
+			mainWindowController.Window.InsertSpan (String.Format (html, args));
 		}
 
 		public DocModel DocModel {
@@ -40,32 +40,35 @@ namespace DocWriter
 			}
 		}
 
-		[Export ("insertExample:")]
-		void InsertExample (NSObject sender)
+		public MainWindow MainWindow {
+			get {
+				return mainWindowController.Window;
+			}
+		}
+
+
+		partial void insertExample (NSObject sender)
 		{
 			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {"))));
 
 			AppendNodeHtml (DocConverter.ToHtml (example, ""));
 		}
 
-		[Export ("insertCode:")]
-		void InsertCode (NSObject sender)
+		partial void insertCode (NSObject sender)
 		{
 			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {")));
 
 			AppendNodeHtml (DocConverter.ToHtml (example, ""));
 		}
 
-		[Export ("insertFExample:")]
-		void InsertFExample (NSObject sender)
+		partial void insertFExample (NSObject sender)
 		{
 			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = "))));
 
 			AppendNodeHtml (DocConverter.ToHtml (example, ""));
 		}
 
-		[Export ("insertFCode:")]
-		void InsertFCode (NSObject sender)
+		partial void insertFCode (NSObject sender)
 		{
 			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = ")));
 
@@ -73,8 +76,8 @@ namespace DocWriter
 		}
 
 		MemberEntryController mec;
-		[Export ("insertReference:")]
-		void InsertReference (NSObject sender)
+
+		partial void insertReference (NSObject sender)
 		{
 			#if false
 			// Work in progress
@@ -82,23 +85,22 @@ namespace DocWriter
 				mec = new MemberEntryController (this);
 			mec.ShowWindow (this);
 			#else
-			InsertHtml ("<a href=''>T:Type.Name</a>");
+			InsertHtml ("<a href=''>T:{0}</a>", MainWindow.SuggestTypeRef ());
 			#endif
 		}
 
 		public void InsertReference (string text)
 		{
-			InsertHtml ("<a href=''>" + text + "</a>");
+			InsertHtml ("<a href=''>T:" + MainWindow.SuggestTypeRef () + "</a>");
 		}
 
 		[Export ("saveDocument:")]
 		void SaveCurrentDocument (NSObject sender)
 		{
-			mainWindowController.Window.SaveCurrentObject ();
+			MainWindow.SaveCurrentObject ();
 		}
 
-		[Export ("insertList:")]
-		void InsertList (NSObject sender)
+		partial void insertList (NSObject sender)
 		{
 			var list = new XElement ("list", new XAttribute ("type", "bullet"),
 				           new XElement ("item", new XElement ("term", new XText ("Text1"))),
@@ -107,8 +109,7 @@ namespace DocWriter
 			AppendNodeHtml (DocConverter.ToHtml (new XElement ("host", list), ""));
 		}
 
-		[Export("insertUrl:")]
-		void InsertUrl (NSObject sender)
+		partial void insertUrl (NSObject sender)
 		{
 			string url = "http://www.xamarin.com";
 			string caption = "Xamarin";
@@ -117,8 +118,7 @@ namespace DocWriter
 
 		}
 
-		[Export ("insertTable:")]
-		void InsertTable (NSObject sender)
+		partial void insertTable (NSObject sender)
 		{
 			var table = new XElement ("list", new XAttribute ("type", "table"),
 				           new XElement ("listheader", 
@@ -135,6 +135,20 @@ namespace DocWriter
 			AppendNodeHtml (a);
 		}
 
+		partial void selectionToLang (NSObject sender)
+		{
+			MainWindow.RunJS ("selectionToCode('langword')");
+		}
+
+		partial void selectionToParam (NSObject sender)
+		{
+			MainWindow.RunJS ("selectionToCode('paramref')");
+		}
+
+		partial void selectionToType (NSObject sender)
+		{
+			MainWindow.RunJS ("selectionToCode('typeparamref')");
+		}
 		public override void WillTerminate (NSNotification notification)
 		{
 			mainWindowController.Window.SaveCurrentObject ();

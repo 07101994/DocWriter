@@ -88,3 +88,12 @@ table, td, tr {
 .to-be-added {
 	background-color: #d4c4c1;
 }
+
+.paramref {
+	font-style: italic;
+}
+
+.typeparamref {
+	font-style: italic;
+	color: #0B802D;
+}

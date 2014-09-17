@@ -212,7 +212,7 @@ WriteLiteral("  ");
 
 
 #line 26 "MemberTemplate.cshtml"
-   if (Model.ReturnValue != null){
+   if (Model.Value != null){
 
 
 #line default
@@ -223,17 +223,17 @@ WriteLiteral(" class=\"title\"");
 
 WriteLiteral(">Return Value:<span");
 
-WriteLiteral(" id=\"return-status\"");
+WriteLiteral(" id=\"value-status\"");
 
 WriteLiteral("></span></div>\n");
 
 WriteLiteral("     <div");
 
-WriteLiteral(" class=\"edit return\"");
+WriteLiteral(" class=\"edit value\"");
 
 WriteLiteral(" contenteditable=\'true\'");
 
-WriteLiteral(" id=\'return\'");
+WriteLiteral(" id=\'value\'");
 
 WriteLiteral(">\n");
 
@@ -262,6 +262,56 @@ WriteLiteral("  ");
 
 
 #line 32 "MemberTemplate.cshtml"
+   if (Model.ReturnValue != null){
+
+
+#line default
+#line hidden
+WriteLiteral("     <div");
+
+WriteLiteral(" class=\"title\"");
+
+WriteLiteral(">Return Value:<span");
+
+WriteLiteral(" id=\"return-status\"");
+
+WriteLiteral("></span></div>\n");
+
+WriteLiteral("     <div");
+
+WriteLiteral(" class=\"edit return\"");
+
+WriteLiteral(" contenteditable=\'true\'");
+
+WriteLiteral(" id=\'return\'");
+
+WriteLiteral(">\n");
+
+
+#line 35 "MemberTemplate.cshtml"
+     
+
+#line default
+#line hidden
+
+#line 35 "MemberTemplate.cshtml"
+       WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));
+
+#line default
+#line hidden
+WriteLiteral("\n     </div>\n");
+
+
+#line 37 "MemberTemplate.cshtml"
+  }
+
+
+#line default
+#line hidden
+WriteLiteral("  ");
+
+
+#line 38 "MemberTemplate.cshtml"
    if (Model.Remarks != null){
 
 
@@ -288,7 +338,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 34 "MemberTemplate.cshtml"
+#line 40 "MemberTemplate.cshtml"
                                                            WriteLiteral (Model.GetHtml ("Docs/remarks"));
 
 #line default
@@ -296,7 +346,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 35 "MemberTemplate.cshtml"
+#line 41 "MemberTemplate.cshtml"
   }
 
 

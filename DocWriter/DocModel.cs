@@ -110,6 +110,7 @@ namespace DocWriter
 		public DocType Type { get; private set; }
 		public XElement MemberElement;
 		public IEnumerable<XElement> Params;
+		public XElement Value;
 		public XElement ReturnValue;
 		public XElement Remarks;
 		public string Kind;
@@ -121,7 +122,8 @@ namespace DocWriter
 			Name = new NSString (e.Attribute ("MemberName").Value);
 			Remarks = e.XPathSelectElement ("Docs/remarks");
 			Params = e.XPathSelectElements ("Docs/param");
-			ReturnValue = e.XPathSelectElement ("Docs/value");
+			Value = e.XPathSelectElement ("Docs/value");
+			ReturnValue = e.XPathSelectElement ("Docs/returns");
 			Kind = e.XPathSelectElement ("MemberType").Value;
 		}
 
@@ -163,7 +165,9 @@ namespace DocWriter
 				return false;
 			if (Remarks != null && !UpdateNode (webView, MemberElement, "Docs/remarks", "remarks", out error))
 				return false;
-			if (ReturnValue != null && !UpdateNode (webView, MemberElement, "Docs/value", "return", out error))
+			if (Value != null && !UpdateNode (webView, MemberElement, "Docs/value", "value", out error))
+				return false;
+			if (ReturnValue != null && !UpdateNode (webView, MemberElement, "Docs/returns", "return", out error))
 				return false;
 			if (Params != null) {
 				foreach (var p in Params) {

@@ -23,6 +23,12 @@
   	   </div>
   	}
   }
+  @if (Model.Value != null){
+     <div class="title">Return Value:<span id="value-status"></span></div>
+     <div class="edit value" contenteditable='true' id='value'>
+     @{WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));}
+     </div>
+  }
   @if (Model.ReturnValue != null){
      <div class="title">Return Value:<span id="return-status"></span></div>
      <div class="edit return" contenteditable='true' id='return'>

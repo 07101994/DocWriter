@@ -5,6 +5,47 @@ Desktop Editor for the ECMA XML Documentation.
 
 Currently the documentation it loads is hardcoded to /cvs/mt/ios-api-docs
 
+How to use it:
+--------------
+
+#1 Checkout your docs
+
+Checkout the documentation in /cvs/mt/ios-api-docs, or alternatively,
+edit the source code to point to your favorite location that contains
+ECMA docs.
+
+#2 Launch the App
+
+Start the application, then select on the left side the node that you
+want to write documentation for.  Then click on the right side (or
+tab) to start editing the documentation.
+
+#3 Make Edits
+
+Both the Edit and the Format menu contains a few useful commands to
+spice up your documentation.  From adding lists, tables, examples,
+links to other docs and code samples, to turning words into language
+words or parameters.
+
+Use Command-R to insert a reference, this will insert a template of a
+ECMA type reference, that you can then edit to point to the actual
+element you want (remember, you need things like T:System.String,
+M:System.Console.WriteLine and so on).
+
+Changes are automatically saved when you switch from one page to
+another.  That said, for the paranoid among us, you can hit Command-S
+to save.
+
+#4 Commit
+
+Once you are happy, quit the app, and do a git commit, and push/rebase
+as necessary.
+
+It is recommended that you restart the app after a push/rebase, or you
+risk losing data.
+
+#5 Done!
+
 TODO: 
 =====
 

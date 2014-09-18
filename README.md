@@ -16,7 +16,7 @@ TODO:
 - [X] Force a save on quit.
 - [X] Add try/catch around the validation timer, and catch errors there
 - [X] Hookup Command-S to save, for the paranoid in us.
-- [ ] Hotkeys to insert various kinds of markup
+- [x] Hotkeys to insert various kinds of markup
 - [X] Implement an "Insert HTML text" option as we can currently only add text at the current location.
 - [ ] Member Lookup UI (see below)
 - [ ] Allow documentation to be loaded from another location
@@ -27,7 +27,7 @@ TODO:
 - [ ] Implement back/forward history
 - [ ] Search bar at the top
 - [ ] Make members clickable, so you can navigate to the contents of that particular node
-- [ ] Ability to insert <see paramref=""/>
+- [x] Ability to insert <see paramref=""/> (done by selecting range, and using Format menu)
 - [ ] Collapse multiple divs in content
 - [ ] Disable formatting on paste (from console for example, we get lots of colors).
 - [ ] Sometimes this is inserting a ton of newline space in the docs, not sure why
@@ -43,6 +43,8 @@ Commands:
 - [ ] Insert number list
 - [x] Insert bullet list
 - [ ] Insert HTTP url (done, need UI to enter the Link/Caption for URL links)
+- [ ] Clean <spans> from pasted text (even plain text is difficult to paste from a web browser)
+- [ ] Command to indent/unindent region of text (for source code updates)
 
 Bugs
 ====
@@ -51,6 +53,19 @@ Inserting an Example after an Example nests the example. (Command-E twice)
 
 It is not possible to add text after an Example.  Perhaps we need to
 insert a spare div to allow editing after an example.
+
+Searching
+=========
+
+This could be slow, but would be nice to load all the docs, so we
+could search over the text
+
+Easy Duplicator
+===============
+
+Find a way to duplicate the body of elements from one element to
+another (for example, overloads), and then the user could jsut fine
+tune the eleemnts.
 
 Big Ideas
 =========

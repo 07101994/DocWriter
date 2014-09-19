@@ -3,22 +3,23 @@ DocWriter
 
 Desktop Editor for the ECMA XML Documentation.
 
-Currently the documentation it loads is hardcoded to /cvs/mt/ios-api-docs
 
 How to use it:
 --------------
 
 #1 Checkout your docs
 
-Checkout the documentation in /cvs/mt/ios-api-docs, or alternatively,
-edit the source code to point to your favorite location that contains
-ECMA docs.
+Checkout your documentation from Git.
 
 #2 Launch the App
 
-Start the application, then select on the left side the node that you
-want to write documentation for.  Then click on the right side (or
-tab) to start editing the documentation.
+Start the application, you will be prompted to open a directory,
+select the toplevel for your docs, for example
+"/Users/miguel/git/ios-api-docs".
+
+Then select on the left side the node that you want to write
+documentation for.  Then click on the right side (or tab) to start
+editing the documentation.
 
 #3 Make Edits
 
@@ -60,9 +61,9 @@ TODO:
 - [x] Hotkeys to insert various kinds of markup
 - [X] Implement an "Insert HTML text" option as we can currently only add text at the current location.
 - [ ] Member Lookup UI (see below)
-- [ ] Allow documentation to be loaded from another location
+- [X] Allow documentation to be loaded from another location
 - [X] Render parse errors as part of the HTML (add a div that we can use to inject errors/colors on parse errors, so that the message is shown in the correct context (specially important for long lists).
-- [ ] Namespace functionality editing
+- [ ] Namespace functionality editing (summary/remarks for a namespace, file ns-XXX.xml)
 - [ ] Support for editing delegates 
 - [ ] Handle clicks on links
 - [ ] Implement back/forward history

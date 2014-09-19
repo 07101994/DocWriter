@@ -34,21 +34,30 @@ namespace DocWriter
 		{
 			Initialize ();
 		}
-		
+
+		public string Path {
+			get {
+				return (WindowController as MainWindowController).Path;
+			}
+		}
+
 		// Shared initialization code
 		void Initialize ()
 		{
-			DocModel = new DocModel ();
+			DocModel = new DocModel (Path);
 		}
+
 
 		public override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
+
 			outline.DataSource = new DocumentTreeDataSource (DocModel);
 			outline.Delegate = new DocumentTreeDelegate (this);
+			Title = "DocWriter - " + Path;
 
 			// Restore the last node
-			var lastOpenedNode = NSUserDefaults.StandardUserDefaults.StringForKey ("currentNode");
+			var lastOpenedNode = NSUserDefaults.StandardUserDefaults.StringForKey ("currentNode"+Path);
 			if (lastOpenedNode != null) {
 				int nsidx = -1;
 				int typeidx = -1;
@@ -178,7 +187,7 @@ namespace DocWriter
 			currentObject = outline.ItemAtRow (outline.SelectedRow);
 			var docNode = currentObject as DocNode;
 			if (docNode != null) {
-				NSUserDefaults.StandardUserDefaults.SetString (docNode.DocPath, "currentNode");
+				NSUserDefaults.StandardUserDefaults.SetString (docNode.DocPath, "currentNode"+Path);
 			}
 
 			var ihtml = currentObject as IHtmlRender;

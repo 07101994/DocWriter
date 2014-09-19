@@ -9,9 +9,8 @@ namespace DocWriter
 {
 	public partial class MainWindowController : MonoMac.AppKit.NSWindowController
 	{
-		#region Constructors
+		public string Path { get; private set; }
 
-		// Called when created from unmanaged code
 		public MainWindowController (IntPtr handle) : base (handle)
 		{
 			Initialize ();
@@ -25,8 +24,9 @@ namespace DocWriter
 		}
 		
 		// Call to load from the XIB/NIB file
-		public MainWindowController () : base ("MainWindow")
+		public MainWindowController (string path) : base ("MainWindow")
 		{
+			Path = path;
 			Initialize ();
 		}
 		
@@ -34,8 +34,6 @@ namespace DocWriter
 		void Initialize ()
 		{
 		}
-
-		#endregion
 
 		//strongly typed window accessor
 		public new MainWindow Window {

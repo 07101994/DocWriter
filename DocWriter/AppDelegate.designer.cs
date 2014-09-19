@@ -12,6 +12,9 @@ namespace DocWriter
 	[Register ("AppDelegate")]
 	partial class AppDelegate
 	{
+		[Outlet]
+		MonoMac.AppKit.NSMenuItem open { get; set; }
+
 		[Action ("insertCode:")]
 		partial void insertCode (MonoMac.Foundation.NSObject sender);
 
@@ -47,6 +50,10 @@ namespace DocWriter
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (open != null) {
+				open.Dispose ();
+				open = null;
+			}
 		}
 	}
 }

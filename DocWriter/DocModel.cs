@@ -444,7 +444,7 @@ namespace DocWriter
 	{
 		List<DocNamespace> namespaces = new List<DocNamespace> ();
 
-		public DocModel (string path = "/cvs/mt/ios-api-docs/en")
+		public DocModel (string path)
 		{
 			var dirs = 
 				from p in Directory.GetDirectories (path)

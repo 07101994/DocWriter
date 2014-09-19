@@ -12,26 +12,26 @@
 	  <div style="font-size:80%;" class="title-code">@Model.SignatureHtml</div>
   </div>
   <div class="title">Summary: <span id="summary-status"></span></div>
-  <div class='edit' id='summary' contenteditable='true'>@{WriteLiteral (Model.GetHtml ("Docs/summary"));}</div>
+  <div class='edit' id='summary' contenteditable='true'>@{WriteLiteral (Model.GetHtmlForNode ("Docs/summary"));}</div>
   @if (Model.Params.Count () > 0){
     <div class="title">Parameters:</div>
   	foreach (var p in Model.Params){ 
   	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
   	   <div class="parameter-name">@name<span id="@paramid-status"></span></div>
-  	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">@{WriteLiteral (DocConverter.ToHtml (p,""));}</div>
+  	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">@{WriteLiteral (Model.ToHtml (p));}</div>
   	}
   }
   @if (Model.Value != null){
      <div class="title">Return Value:<span id="value-status"></span></div>
-     <div class="edit value" contenteditable='true' id='value'>@{WriteLiteral (DocConverter.ToHtml (Model.Value,""));}</div>
+     <div class="edit value" contenteditable='true' id='value'>@{WriteLiteral (Model.ToHtml (Model.Value));}</div>
   }
   @if (Model.ReturnValue != null){
      <div class="title">Return Value:<span id="return-status"></span></div>
-     <div class="edit return" contenteditable='true' id='return'>@{WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));}</div>
+     <div class="edit return" contenteditable='true' id='return'>@{WriteLiteral (Model.ToHtml (Model.ReturnValue));}</div>
   }
   @if (Model.Remarks != null){
 	  <div class="title">Remarks:<span id="remarks-status"></span></div>
-	  <div class="edit" id='remarks' contenteditable='true'>@{WriteLiteral (Model.GetHtml ("Docs/remarks"));}</div>
+	  <div class="edit" id='remarks' contenteditable='true'>@{WriteLiteral (Model.GetHtmlForNode ("Docs/remarks"));}</div>
   }
 </body>
 </html>

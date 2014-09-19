@@ -109,7 +109,7 @@ WriteLiteral(">");
 
 
 #line 15 "MemberTemplate.cshtml"
-                                                          WriteLiteral (Model.GetHtml ("Docs/summary"));
+                                                          WriteLiteral (Model.GetHtmlForNode ("Docs/summary"));
 
 #line default
 #line hidden
@@ -188,7 +188,7 @@ WriteLiteral(">");
 
 
 #line 21 "MemberTemplate.cshtml"
-                                                                             WriteLiteral (DocConverter.ToHtml (p,""));
+                                                                             WriteLiteral (Model.ToHtml (p));
 
 #line default
 #line hidden
@@ -233,7 +233,7 @@ WriteLiteral(">");
 
 
 #line 26 "MemberTemplate.cshtml"
-                                                                 WriteLiteral (DocConverter.ToHtml (Model.Value,""));
+                                                                 WriteLiteral (Model.ToHtml (Model.Value));
 
 #line default
 #line hidden
@@ -277,7 +277,7 @@ WriteLiteral(">");
 
 
 #line 30 "MemberTemplate.cshtml"
-                                                                   WriteLiteral (DocConverter.ToHtml (Model.ReturnValue,""));
+                                                                   WriteLiteral (Model.ToHtml (Model.ReturnValue));
 
 #line default
 #line hidden
@@ -321,7 +321,7 @@ WriteLiteral(">");
 
 
 #line 34 "MemberTemplate.cshtml"
-                                                           WriteLiteral (Model.GetHtml ("Docs/remarks"));
+                                                           WriteLiteral (Model.GetHtmlForNode ("Docs/remarks"));
 
 #line default
 #line hidden

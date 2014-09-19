@@ -166,7 +166,7 @@ WriteLiteral(">\n");
 #line hidden
 
 #line 20 "TypeTemplate.cshtml"
-        WriteLiteral (DocConverter.ToHtml (p,""));
+        WriteLiteral (Model.ToHtml (p));
 
 #line default
 #line hidden

@@ -55,9 +55,9 @@ public static class DocConverter {
 	/// <returns>HTML structured with annotations.  Suitable to use on a contenteditable div</returns>
 	/// <param name="rootNode">Root node containing the ECMA documentation, the containing node.</param>
 	/// <param name="currentFile">Message hint used when reporting warnings.</param>
-	public static string ToHtml (XElement rootNode, string currentFile)
+	public static string ToHtml (XElement rootNode, string currentFile, string baseXmlPath)
 	{
-		var ret = new EcmaToXml (currentFile).Convert (rootNode);
+		var ret = new EcmaToXml (currentFile, baseXmlPath).Convert (rootNode);
 		return ret;
 	}
 }
@@ -428,13 +428,15 @@ static class XmlToEcma {
 
 class EcmaToXml {
 	string currentFile;
+	string baseXmlPath;
 
-	public EcmaToXml (string currentFile = null)
+	public EcmaToXml (string currentFile = null, string baseXmlPath = "")
 	{
 		if (currentFile == null)
 			currentFile = "<In memory>";
 
 		this.currentFile = currentFile;
+		this.baseXmlPath = baseXmlPath;
 	}
 
 	int warnCount = 0;
@@ -664,7 +666,7 @@ class EcmaToXml {
 	string RenderImage (XElement xel)
 	{
 		var target = xel.Attribute ("href").Value;
-		return string.Format ("<img src='{0}'>", target);
+		return string.Format ("<img src='{0}'>", Path.Combine (baseXmlPath, "_images", target));
 	}
 
 	string RenderParamRef (XElement xel)

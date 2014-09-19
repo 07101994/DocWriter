@@ -18,7 +18,7 @@ namespace DocWriter
 	public partial class MemberEntry : MonoMac.AppKit.NSWindow
 	{
 		DocModel docModel;
-		AppDelegate appd;
+		MainWindowController mainWindowController;
 
 		// Called when created from unmanaged code
 		public MemberEntry (IntPtr handle) : base (handle)
@@ -44,8 +44,8 @@ namespace DocWriter
 			textField.Changed += HandleChanged;;
 			textField.EditingEnded += HandleEditingEnded;
 
-			appd = (this.WindowController as MemberEntryController).appDelegate;
-			docModel = appd.DocModel;
+			mainWindowController = (this.WindowController as MemberEntryController).mainWindowController;
+			docModel = mainWindowController.Window.DocModel;
 
 			PerformFilter ("");
 			tableView.Delegate = new CompleteTableViewDelegate (this);
@@ -101,7 +101,7 @@ namespace DocWriter
 			else
 				v = "N:" + v;
 
-			appd.InsertReference (v);
+			mainWindowController.InsertReference (v);
 			Close ();
 		}
 

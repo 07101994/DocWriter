@@ -14,6 +14,7 @@ using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
 using System.Text;
+using System.Xml.Linq;
 
 namespace DocWriter
 {
@@ -37,7 +38,7 @@ namespace DocWriter
 
 		public string Path {
 			get {
-				return (WindowController as MainWindowController).Path;
+				return (WindowController as MainWindowController).WindowPath;
 			}
 		}
 
@@ -215,9 +216,26 @@ namespace DocWriter
 			webView.StringByEvaluatingJavaScriptFromString ("insertSpanAtCursor(\"" + EscapeHtml (html) + "\")");
 		}
 
-		public void AppendNodeHtml (string html)
+		//
+		// Turns the provided ECMA XML node into HTML and appends it to the current node on the
+		// rendered HTML.
+		//
+		public void AppendNode (XElement ecmaXml)
 		{
-			webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAfterCurrentNode(\"" + EscapeHtml (html) + "\")");
+			DocNode docNode = currentObject as DocNode;
+			if (docNode != null) {
+				var html = DocConverter.ToHtml (ecmaXml, "", docNode.DocumentDirectory);
+				webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAfterCurrentNode(\"" + EscapeHtml (html) + "\")");
+			}
+		}
+
+		public string CurrentNodePath {
+			get {
+				DocNode docNode = currentObject as DocNode;
+				if (docNode == null)
+					return null;
+				return docNode.DocumentDirectory;
+			}
 		}
 
 		class DocumentTreeDelegate : NSOutlineViewDelegate {

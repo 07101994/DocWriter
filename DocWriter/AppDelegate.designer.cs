@@ -27,6 +27,9 @@ namespace DocWriter
 		[Action ("insertFExample:")]
 		partial void insertFExample (MonoMac.Foundation.NSObject sender);
 
+		[Action ("insertImage:")]
+		partial void insertImage (MonoMac.Foundation.NSObject sender);
+
 		[Action ("insertList:")]
 		partial void insertList (MonoMac.Foundation.NSObject sender);
 

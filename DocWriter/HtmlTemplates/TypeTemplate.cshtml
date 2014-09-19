@@ -17,7 +17,7 @@
   	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
   	   <div class="parameter-name">@name<span id="@paramid-status"></span></div>
   	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">
-  	   @{WriteLiteral (DocConverter.ToHtml (p,""));}
+  	   @{WriteLiteral (Model.ToHtml (p));}
   	   </div>
   	}
   }

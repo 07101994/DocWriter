@@ -52,9 +52,9 @@ namespace DocWriter
 			}
 		}
 
-		public string GetHtml (XElement element, string xpath)
+		public string GetHtmlForNode (XElement element, string xpath)
 		{
-			return DocConverter.ToHtml (element.XPathSelectElement (xpath), Name.ToString ());
+			return DocConverter.ToHtml (element.XPathSelectElement (xpath), Name.ToString (), DocumentDirectory);
 		}
 			
 		//
@@ -110,6 +110,18 @@ namespace DocWriter
 				return "";
 			}
 		}
+
+		public virtual string DocumentDirectory {
+			get {
+				return "";
+
+			}
+		}
+
+		public string ToHtml (XElement root)
+		{
+			return DocConverter.ToHtml (root, "inmemory", DocumentDirectory);
+		}
 	}
 
 	// DocMember: renders an ECMA type member (methods, properties, properties, fields)
@@ -142,7 +154,7 @@ namespace DocWriter
 
 		public string SummaryHtml {
 			get {
-				return GetHtml (MemberElement, "Docs/summary");
+				return GetHtmlForNode (MemberElement, "Docs/summary");
 			}
 		}
 
@@ -152,9 +164,9 @@ namespace DocWriter
 			}
 		}
 
-		public string GetHtml (string xpath)
+		public string GetHtmlForNode (string xpath)
 		{
-			return GetHtml (MemberElement, xpath);
+			return GetHtmlForNode (MemberElement, xpath);
 		}
 			
 		public string ValidateChanges (IWebView webView, string [] nodes)
@@ -189,6 +201,12 @@ namespace DocWriter
 		public override string DocPath {
 			get {
 				return Type.DocPath + "/" + CName;
+			}
+		}
+
+		public override string DocumentDirectory {
+			get {
+				return Type.DocumentDirectory;
 			}
 		}
 	}
@@ -272,13 +290,13 @@ namespace DocWriter
 
 		public string SummaryHtml {
 			get {
-				return GetHtml (Root, "/Type/Docs/summary");
+				return GetHtmlForNode (Root, "/Type/Docs/summary");
 			}
 		}
 
 		public string RemarksHtml {
 			get {
-				var x =  GetHtml (Root, "/Type/Docs/remarks");
+				var x =  GetHtmlForNode (Root, "/Type/Docs/remarks");
 				return x;
 			}
 		}
@@ -359,6 +377,12 @@ namespace DocWriter
 				return Namespace.DocPath + "/" + CName;
 			}
 		}
+
+		public override string DocumentDirectory {
+			get {
+				return Namespace.DocumentDirectory;
+			}
+		}
 	}
 
 	// Provides a host to show the namespace on the tree.
@@ -435,6 +459,12 @@ namespace DocWriter
 		public override string DocPath {
 			get {
 				return CName;
+			}
+		}
+
+		public override string DocumentDirectory {
+			get {
+				return path;
 			}
 		}
 	}

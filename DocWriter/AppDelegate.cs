@@ -13,7 +13,6 @@ namespace DocWriter
 	public partial class AppDelegate : NSApplicationDelegate
 	{
 		List<MainWindowController> windows = new List<MainWindowController> ();
-		MainWindowController mainWindowController;
 
 		public AppDelegate ()
 		{
@@ -29,9 +28,7 @@ namespace DocWriter
 				foreach (var d in dirs.Distinct ()) {
 					OpenDir (d);
 				}
-				if (windows.Count > 0)
-					mainWindowController = windows [0];
-				else
+				if (windows.Count == 0)
 					OpenDialog (this);
 			} else 
 				OpenDialog (this);
@@ -44,29 +41,7 @@ namespace DocWriter
 					SaveStatus ();
 				}
 			});
-
-			NSWindow.Notifications.ObserveDidBecomeKey ((a, b) => {
-				var target = b.Notification.Object as MainWindow;
-				if (target != null){
-					mainWindowController = target.WindowController as MainWindowController;
-					//Console.WriteLine ("Switching to {0}", target.Path);
-				}
-			});
 		}
-
-		public DocModel DocModel {
-			get {
-				return mainWindowController.Window.DocModel;
-			}
-		}
-
-		public MainWindow MainWindow {
-			get {
-				return mainWindowController.Window;
-			}
-		}
-
-
 
 		public override void WillTerminate (NSNotification notification)
 		{

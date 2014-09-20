@@ -195,7 +195,13 @@ namespace DocWriter
 			if (ihtml == null)
 				return;
 
-			webView.MainFrame.LoadHtmlString (ihtml.Render (), NSBundle.MainBundle.ResourceUrl);
+			string contents;
+			try {
+				contents = ihtml.Render ();
+			} catch (Exception e){
+				contents = String.Format ("<body><p>Error Loading the contents for the new node<p>Exception:<p><pre>{0}</pre>", System.Web.HttpUtility.HtmlEncode (e.ToString ()));
+			}
+			webView.MainFrame.LoadHtmlString (contents, NSBundle.MainBundle.ResourceUrl);
 		}
 
 		static string EscapeHtml (string html)

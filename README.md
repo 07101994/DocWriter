@@ -53,7 +53,7 @@ TODO:
 - [X] Javascript API to inject HTML at the cursor position (we have
       inject text, just not inject HTML, needed for inserting actual ECMA
       snippets)
-- [ ] Add image loading support
+- [x] Add image loading support
 - [x] Allow editing of the enums at the type level, without having to go element by element
 - [X] Force a save on quit.
 - [X] Add try/catch around the validation timer, and catch errors there

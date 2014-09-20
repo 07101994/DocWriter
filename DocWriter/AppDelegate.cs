@@ -43,17 +43,22 @@ namespace DocWriter
 			});
 		}
 
+		bool quitting;
 		public override void WillTerminate (NSNotification notification)
 		{
 			foreach (var wc in windows) {
 				wc.Window.SaveCurrentObject ();
 			}
+			SaveStatus ();
+			quitting = true;
 		}
 
 		// Saves the list of open windows
 		//
 		void SaveStatus ()
 		{
+			if (quitting)
+				return;
 			NSUserDefaults.StandardUserDefaults ["LoadedDirectories"] = NSArray.FromStrings (windows.Select (wc => wc.WindowPath).ToArray ());
 		}
 

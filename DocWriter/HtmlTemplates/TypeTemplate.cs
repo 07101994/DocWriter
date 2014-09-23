@@ -156,24 +156,18 @@ WriteAttribute ("id", " id=\"", "\""
 #line hidden
 , false)
 );
-WriteLiteral(">\n");
+WriteLiteral(">");
 
 
-#line 20 "TypeTemplate.cshtml"
-  	   
-
-#line default
-#line hidden
-
-#line 20 "TypeTemplate.cshtml"
-        WriteLiteral (Model.ToHtml (p));
+#line 19 "TypeTemplate.cshtml"
+                                                                             WriteLiteral (Model.ToHtml (p));
 
 #line default
 #line hidden
-WriteLiteral("\n  \t   </div>\n");
+WriteLiteral("</div>\n");
 
 
-#line 22 "TypeTemplate.cshtml"
+#line 20 "TypeTemplate.cshtml"
   	}
   }
 
@@ -199,7 +193,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 25 "TypeTemplate.cshtml"
+#line 23 "TypeTemplate.cshtml"
                                                           WriteLiteral (Model.RemarksHtml);
 
 #line default
@@ -211,13 +205,13 @@ WriteLiteral(" class=\'caption\'");
 WriteLiteral(">Members</div>\n");
 
 
-#line 27 "TypeTemplate.cshtml"
+#line 25 "TypeTemplate.cshtml"
   
 
 #line default
 #line hidden
 
-#line 27 "TypeTemplate.cshtml"
+#line 25 "TypeTemplate.cshtml"
    for (int n = 0; n < Model.NodeCount; n++){
 
 
@@ -230,7 +224,7 @@ WriteLiteral(" class=\"title title-code\"");
 WriteLiteral(">");
 
 
-#line 28 "TypeTemplate.cshtml"
+#line 26 "TypeTemplate.cshtml"
                             Write(Model[n].SignatureHtml);
 
 
@@ -241,7 +235,7 @@ WriteLiteral("<span");
 WriteAttribute ("id", " id=\"", "\""
 , Tuple.Create<string,object,bool> ("", "summary-", true)
 
-#line 28 "TypeTemplate.cshtml"
+#line 26 "TypeTemplate.cshtml"
                                    , Tuple.Create<string,object,bool> ("", n
 
 #line default
@@ -258,7 +252,7 @@ WriteLiteral(" class=\"edit\"");
 WriteAttribute ("id", " id=\"", "\""
 , Tuple.Create<string,object,bool> ("", "summary-", true)
 
-#line 29 "TypeTemplate.cshtml"
+#line 27 "TypeTemplate.cshtml"
 , Tuple.Create<string,object,bool> ("", n
 
 #line default
@@ -270,7 +264,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 29 "TypeTemplate.cshtml"
+#line 27 "TypeTemplate.cshtml"
                                                               WriteLiteral (Model [n].SummaryHtml);
 
 #line default
@@ -278,7 +272,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 30 "TypeTemplate.cshtml"
+#line 28 "TypeTemplate.cshtml"
   }
 
 

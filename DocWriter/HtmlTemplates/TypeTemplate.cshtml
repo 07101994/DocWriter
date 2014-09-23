@@ -16,9 +16,7 @@
   	foreach (var p in Model.Params){ 
   	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
   	   <div class="parameter-name">@name<span id="@paramid-status"></span></div>
-  	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">
-  	   @{WriteLiteral (Model.ToHtml (p));}
-  	   </div>
+  	   <div class="edit parameter-doc" contenteditable='true' id="@paramid">@{WriteLiteral (Model.ToHtml (p));}</div>
   	}
   }
   <div class="title">Remarks:<span id="remarks-status"></span></div>

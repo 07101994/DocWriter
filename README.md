@@ -50,6 +50,7 @@ risk losing data.
 TODO: 
 =====
 
+- [X] HTML to XML: images needs to remove everything up to _images
 - [X] Javascript API to inject HTML at the cursor position (we have
       inject text, just not inject HTML, needed for inserting actual ECMA
       snippets)

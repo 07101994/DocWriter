@@ -113,7 +113,7 @@ static class XmlToEcma {
 				}
 				break;
 			case "img":
-				yield return new XElement ("img", new XAttribute ("href", element.Attributes ["src"].Value));
+				yield return new XElement ("img", new XAttribute ("href", GetImgTarget (element)));
 				break;
 			case "br":
 				yield return new XElement ("para");
@@ -128,6 +128,16 @@ static class XmlToEcma {
 				break;
 			}
 		}
+	}
+
+	static string GetImgTarget (HtmlNode element)
+	{
+		var target = element.Attributes ["src"].Value;
+		if (!target.StartsWith ("http")) {
+			int p = target.LastIndexOf ("/");
+			target = target.Substring (p + 1);
+		}
+		return target;
 	}
 
 	static bool IsInlineElement (XNode node)
@@ -266,7 +276,7 @@ static class XmlToEcma {
 					xp.Add (new XElement ("see", new XAttribute ("cref", child.InnerText)));
 					break;
 				case "img":
-					xp.Add (new XElement ("img", new XAttribute ("href", child.Attributes ["src"].Value)));
+					xp.Add (new XElement ("img", new XAttribute ("href", GetImgTarget (child))));
 					break;
 				case "code":
 					var kind = child.Attributes ["class"].Value;

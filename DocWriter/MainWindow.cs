@@ -15,6 +15,7 @@ using MonoMac.Foundation;
 using MonoMac.AppKit;
 using System.Text;
 using System.Xml.Linq;
+using MonoMac.WebKit;
 
 namespace DocWriter
 {
@@ -70,15 +71,34 @@ namespace DocWriter
 				if (components.Length > 2)
 					SelectMember (nsidx, typeidx, components [2]);
 			}
-
+			webView.DecidePolicyForNavigation += HandleDecidePolicyForNavigation;
 			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
 		}
 	
+		void HandleDecidePolicyForNavigation (object sender, MonoMac.WebKit.WebNavigationPolicyEventArgs e)
+		{
+			switch (e.OriginalUrl.Scheme){
+			case "ecma":
+				WebView.DecideIgnore (e.DecisionToken);
+				NavigateTo (e.OriginalUrl.AbsoluteString.Substring (7));
+				return;
+
+				// This is one of our rendered ecma links, we want to extract the target
+				// from the text, not the href attribute value (since this is not easily
+				// editable, and the text is.
+			case "goto":
+				NavigateTo (RunJS ("document.getElementById ('" + e.OriginalUrl.Host + "').text"));
+				break;
+			}
+			WebView.DecideUse (e.DecisionToken);
+		}
+
 		int SelectNamespace (string name)
 		{
 			for (int n = DocModel.NodeCount, i = 0; i < n; i++) {
 				if (DocModel [i].CName == name) {
 					outline.SelectRow (i, false);
+					outline.ScrollRowToVisible (i);
 					return i;
 				}
 			}
@@ -93,6 +113,7 @@ namespace DocWriter
 				if (ns [i].CName == type) {
 					var r = outline.RowForItem (ns [i]);
 					outline.SelectRow (r, false);
+					outline.ScrollRowToVisible (r);
 					return i;
 				}
 			}
@@ -107,11 +128,74 @@ namespace DocWriter
 				if (type [i].CName == name) {
 					var r = outline.RowForItem (type [i]);
 					outline.SelectRow (r, false);
+					outline.ScrollRowToVisible (r);
 					return;
 				}
 			}
 		}
 
+		void SplitType (string rest, out string ns, out string type)
+		{
+			var p = rest.LastIndexOf ('.');
+			if (p == -1) {
+				ns = "";
+				type = rest;
+			} else {
+				ns = rest.Substring (0, p);
+				type = rest.Substring (p + 1);
+			}
+		}
+
+		void SplitMember (string rest, out string ns, out string type, out string method, bool search_open_parens = false)
+		{
+			int l = rest.Length-1;
+
+			// Look for M:System.Console.WriteLine(object)?
+			if (search_open_parens) {
+				var p = rest.IndexOf ('(');
+				if (p != -1)
+					l = p;
+			}
+			int pp = rest.LastIndexOf ('.', l);
+			SplitType (rest.Substring (0, pp), out ns, out type);
+			method = rest.Substring (pp + 1);
+		}
+
+		// This is not currently very precise, for now, it is just a convenience function, later we need to enforce method call parameters
+		public bool NavigateTo (string url)
+		{
+			if (url.Length < 3)
+				return false;
+			if (url [1] != ':')
+				return false;
+			var rest = url.Substring (2);
+			string ns, type, member;
+	
+			switch (url [0]) {
+			case 'N':
+				SelectNamespace (rest);
+				return true;
+			case 'T': 
+				SplitType (rest, out ns, out type);
+				var idx = SelectNamespace (ns);
+				SelectType (idx, type);
+				return true;
+			case 'M':
+			case 'P':
+			case 'E':
+				SplitMember (rest, out ns, out type, out member, search_open_parens: true);
+				idx = SelectNamespace (ns);
+				var tidx = SelectType (idx, type);
+				SelectMember (idx, tidx, member);
+				return true;
+			case 'F':
+				SplitMember (rest, out ns, out type, out member);
+				idx = SelectNamespace (ns);
+				SelectType (idx, type);
+				return true;
+			}
+			return false;
+		}
 
 		public string RunJS (string code)
 		{

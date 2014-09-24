@@ -89,22 +89,34 @@ WriteLiteral(">");
 
 #line default
 #line hidden
-WriteLiteral(" ");
+WriteLiteral(" <a");
+
+WriteAttribute ("href", " href=\'", "\'"
+, Tuple.Create<string,object,bool> ("", "ecma://T:", true)
+
+#line 13 "NamespaceTemplate.cshtml"
+                    , Tuple.Create<string,object,bool> ("", Model[n].FullName
+
+#line default
+#line hidden
+, false)
+);
+WriteLiteral(">");
 
 
 #line 13 "NamespaceTemplate.cshtml"
-                                    Write(Model[n].Name);
+                                                                          Write(Model[n].Name);
 
 
 #line default
 #line hidden
-WriteLiteral("<span");
+WriteLiteral("</a><span");
 
 WriteAttribute ("id", " id=\"", "\""
 , Tuple.Create<string,object,bool> ("", "summary-", true)
 
 #line 13 "NamespaceTemplate.cshtml"
-                                  , Tuple.Create<string,object,bool> ("", n
+                                                                            , Tuple.Create<string,object,bool> ("", n
 
 #line default
 #line hidden

@@ -10,7 +10,7 @@
 <body>
   <div class="caption">@Model.Name</div>
   @for (int n = 0; n < Model.NodeCount; n++){
-  	<div class="title">@Model[n].KindHtml @Model[n].Name<span id="summary-@n-status"></span></div>
+  	<div class="title">@Model[n].KindHtml <a href='ecma://T:@Model[n].FullName'>@Model[n].Name</a><span id="summary-@n-status"></span></div>
   	<div class="edit" id="summary-@n" contenteditable='true'>@{WriteLiteral (Model [n].SummaryHtml);}</div>
   }
 </body>

@@ -122,12 +122,19 @@ static class XmlToEcma {
 				if (element is HtmlTextNode) {
 					yield return new XText (HttpUtility.HtmlDecode ((element as HtmlTextNode).Text));
 				} else if (element is HtmlCommentNode) {
-					yield return new XComment ((element as HtmlCommentNode).Comment);
+					yield return new XComment (ExtractComment ((element as HtmlCommentNode).Comment));
 				} else
 					throw new UnsupportedElementException ("Do not have support for " + element.Name);
 				break;
 			}
 		}
+	}
+
+	static string ExtractComment (string text)
+	{
+		if (text.StartsWith ("<!--") && text.EndsWith ("-->"))
+			return text.Substring (4, text.Length - 7);
+		return text;
 	}
 
 	static string GetImgTarget (HtmlNode element)
@@ -689,11 +696,12 @@ class EcmaToXml {
 		return string.Format ("<code class='typeparamref'>{0}</code>", xel.Attribute ("name").Value);
 	}
 
+	int href_id;
 	string RenderSee (XElement xel)
 	{
 		var target = xel.Attribute ("cref");
 		if (target != null)
-			return string.Format ("<a href=''>{0}</a>", target.Value);
+			return string.Format ("<a href='goto://l-{1}' id='l-{1}'>{0}</a>", target.Value, href_id++);
 		var lang = xel.Attribute ("langword").Value;
 		return string.Format ("<code class='langword'>{0}</code>", lang);
 	}

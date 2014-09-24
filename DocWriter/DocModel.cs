@@ -241,6 +241,12 @@ namespace DocWriter
 			}
 		}
 
+		public string FullName {
+			get {
+				return Namespace.Name + "." + Name;
+			}
+		}
+
 		public int NodeCount {
 			get {
 				return xml_members.Length;

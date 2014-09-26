@@ -55,6 +55,12 @@ namespace DocWriter
 			Window.AppendNode (ecmaXml);
 		}
 
+		void AppendPara ()
+		{
+			AppendEcmaNode (new XElement ("para", new XText (".")));
+
+		}
+
 		[Export ("saveDocument:")]
 		void SaveCurrentDocument (NSObject sender)
 		{
@@ -67,6 +73,7 @@ namespace DocWriter
 			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {")));
 
 			AppendEcmaNode (example);
+			AppendPara ();
 		}
 
 		[Export ("insertExample:")]
@@ -75,6 +82,7 @@ namespace DocWriter
 			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {"))));
 
 			AppendEcmaNode (example);
+			AppendPara ();
 		}
 
 		[Export ("insertFCode:")]
@@ -83,6 +91,7 @@ namespace DocWriter
 			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = ")));
 
 			AppendEcmaNode (example);
+			AppendPara ();
 		}
 
 		[Export ("insertFExample:")]
@@ -91,6 +100,7 @@ namespace DocWriter
 			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = "))));
 
 			AppendEcmaNode (example);
+			AppendPara ();
 		}
 
 		[Export ("insertImage:")]

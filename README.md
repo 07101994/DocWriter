@@ -66,12 +66,12 @@ TODO:
 - [X] Render parse errors as part of the HTML (add a div that we can use to inject errors/colors on parse errors, so that the message is shown in the correct context (specially important for long lists).
 - [ ] Namespace functionality editing (summary/remarks for a namespace, file ns-XXX.xml)
 - [ ] Support for editing delegates 
-- [ ] Handle clicks on links
+- [X] Handle clicks on links
 - [ ] Implement back/forward history
 - [ ] Search bar at the top
 - [ ] Make members clickable, so you can navigate to the contents of that particular node
 - [x] Ability to insert <see paramref=""/> (done by selecting range, and using Format menu)
-- [ ] Collapse multiple divs in content
+- [X] Collapse multiple divs in content
 - [ ] Disable formatting on paste (from console for example, we get lots of colors).
 - [ ] Sometimes this is inserting a ton of newline space in the docs, not sure why
 - [X] Need to collapse <divs> inside code that are added naturally by the contenteditable

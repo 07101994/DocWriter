@@ -59,12 +59,11 @@ function insertHtmlAfterCurrentNode (html)
 	sel = window.getSelection ()
     if (sel.type == "Caret"	) {
     	
-    	attrs = sel.focusNode.attributes;
-    	if (attrs && attrs ["class"] && attrs ["class"].value == "edit")
+    	if ($(sel.focusNode).hasClass ("edit"))
     	   appendon = sel.focusNode;
     	else {
 	        cl = sel.focusNode.parentNode.attributes ["class"]; 
-	    	if (cl == undefined || cl.value == "edit"){
+	    	if (cl == undefined || $(sel.focusNode.parentNode).hasClass ("edit")){
 	    	   appendon = sel.focusNode.parentNode;
 	    	} else {
 			   appendon = sel.focusNode.parentNode.parentNode;

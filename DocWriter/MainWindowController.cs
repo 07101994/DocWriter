@@ -103,6 +103,12 @@ namespace DocWriter
 			AppendPara ();
 		}
 
+		[Export ("insertH2:")]
+		void InsertH2 (NSObject sender)
+		{
+			AppendEcmaNode (new XElement ("host", new XElement ("format", new XAttribute ("type", "text/html"), new XElement ("h2", new XText ("Header")))));
+		}
+
 		[Export ("insertImage:")]
 		void insertImage (NSObject sender)
 		{
@@ -207,14 +213,19 @@ namespace DocWriter
 			AppendEcmaNode (new XElement ("Host", table));
 		}
 
+		public void InsertUrl (string caption, string url)
+		{
+			InsertHtml (string.Format ("<div class='verbatim'><a href='{0}'>{1}</a></div>", url, caption));
+		}
+
 		[Export ("insertUrl:")]
 		void insertUrl (NSObject sender)
 		{
 			string url = "http://www.xamarin.com";
 			string caption = "Xamarin";
 
-			InsertHtml (string.Format ("<div class='verbatim'><a href='{0}'>{1}</a></div>", url, caption));
-
+			var urlController = new InsertUrlController (this);
+			urlController.ShowWindow (this);
 		}
 
 		[Export ("selectionToLang:")]

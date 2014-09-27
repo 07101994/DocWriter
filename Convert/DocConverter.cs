@@ -550,6 +550,7 @@ class EcmaToXml {
 				case "c":
 					sb.Append (RenderC (el));
 					break;
+
 				default:
 					Console.WriteLine ("File: {0} node: {1}", currentFile, el);
 					throw new UnsupportedElementException ("No support for handling nodes of type " + el.Name);

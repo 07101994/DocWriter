@@ -103,11 +103,17 @@
     <Compile Include="HtmlTemplates\NamespaceTemplate.cs">
       <DependentUpon>NamespaceTemplate.cshtml</DependentUpon>
     </Compile>
+    <Compile Include="InsertUrl.cs" />
+    <Compile Include="InsertUrlController.cs" />
+    <Compile Include="InsertUrl.designer.cs">
+      <DependentUpon>InsertUrl.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
     <InterfaceDefinition Include="MainMenu.xib" />
     <InterfaceDefinition Include="MemberEntry.xib" />
+    <InterfaceDefinition Include="InsertUrl.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />

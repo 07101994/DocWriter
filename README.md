@@ -5,15 +5,15 @@ Desktop Editor for the ECMA XML Documentation.
 
 
 How to use it:
---------------
+==============
 
 1. Checkout your docs
-=====================
+---------------------
 
 Checkout your documentation from Git.
 
 2. Launch the App
-=================
+-----------------
 
 Start the application, you will be prompted to open a directory,
 select the toplevel for your docs, for example
@@ -24,7 +24,7 @@ documentation for.  Then click on the right side (or tab) to start
 editing the documentation.
 
 3. Make Edits
-=============
+-------------
 
 Both the Edit and the Format menu contains a few useful commands to
 spice up your documentation.  From adding lists, tables, examples,
@@ -49,7 +49,7 @@ they are typically used to flag a word as a language word, a word to
 be a parameter reference or a type reference (for generic methods).
 
 4. Commit
-=========
+---------
 
 Once you are happy, quit the app, and do a git commit, and push/rebase
 as necessary.  You should review the changes before committing, just
@@ -61,7 +61,7 @@ risk losing data.  Because the app does not reload files that are
 modified/altered behind its back.
 
 5. Done!
-========
+--------
 
 TODO: 
 -----
@@ -106,7 +106,7 @@ Commands:
 - [ ] Command to indent/unindent region of text (for source code updates)
 
 Bugs
-====
+----
 
 Inserting an Example after an Example nests the example. (Command-E twice)
 
@@ -114,20 +114,20 @@ It is not possible to add text after an Example.  Perhaps we need to
 insert a spare div to allow editing after an example.
 
 Searching
-=========
+---------
 
 This could be slow, but would be nice to load all the docs, so we
 could search over the text
 
 Easy Duplicator
-===============
+---------------
 
 Find a way to duplicate the body of elements from one element to
 another (for example, overloads), and then the user could jsut fine
 tune the eleemnts.
 
 Big Ideas
-=========
+---------
 
 Perhaps we could host more than one Web View, host couple of side web
 views that would dynamically get the contents from Googling on
@@ -136,7 +136,7 @@ StackOverflow side-by-side.
 Perhaps show the source code for the binding for a particular API.
 
 Tests
-=====
+-----
 
 Currently I use the body of documentation from ios-api-docs as a test.    Use the
 Convert solution to load, it will try to convert all the docs to HTML and then back
@@ -148,7 +148,7 @@ that it can not handle.
 
 
 Member Lookup UI
-================
+----------------
 
 This is the user interface that pops up when you hit a keystroke to
 add a link to a member.  It should offer member completion as you
@@ -173,18 +173,18 @@ Currently, there is no really support for inserting the proper prefix,
 it is just hardcoded to "N:".
 
 Wanted:
-=======
+-------
 
 - [ ] Flag members that are auto-documented as such, to now waste documenters time on it.
 
 
 Handle Clicks on Links
-======================
+----------------------
 
 We could navigate to that page, 
 
 
 Search Bar
-==========
+----------
 
 Linked to Command-L, as you type, it finds the member on the right side?

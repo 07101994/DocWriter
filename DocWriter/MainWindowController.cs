@@ -70,7 +70,7 @@ namespace DocWriter
 		[Export ("insertCode:")]
 		void insertCode (NSObject sender)
 		{
-			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {")));
+			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "C#"), new XCData ("class Sample {")));
 
 			AppendEcmaNode (example);
 			AppendPara ();
@@ -79,7 +79,7 @@ namespace DocWriter
 		[Export ("insertExample:")]
 		void insertExample (NSObject sender)
 		{
-			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "c#"), new XText ("class Sample {"))));
+			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "C#"), new XCData ("class Sample {"))));
 
 			AppendEcmaNode (example);
 			AppendPara ();
@@ -88,7 +88,7 @@ namespace DocWriter
 		[Export ("insertFCode:")]
 		void insertFCode (NSObject sender)
 		{
-			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = ")));
+			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "F#"), new XCData ("let sample = ")));
 
 			AppendEcmaNode (example);
 			AppendPara ();
@@ -97,7 +97,7 @@ namespace DocWriter
 		[Export ("insertFExample:")]
 		void insertFExample (NSObject sender)
 		{
-			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "F#"), new XText ("let sample = "))));
+			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "F#"), new XCData ("let sample = "))));
 
 			AppendEcmaNode (example);
 			AppendPara ();

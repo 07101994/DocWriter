@@ -118,6 +118,12 @@ namespace DocWriter
 			}
 		}
 
+		public virtual bool IsAutodocumented {
+			get {
+				return false;
+			}
+		}
+
 		public string ToHtml (XElement root)
 		{
 			return DocConverter.ToHtml (root, "inmemory", DocumentDirectory);
@@ -207,6 +213,80 @@ namespace DocWriter
 		public override string DocumentDirectory {
 			get {
 				return Type.DocumentDirectory;
+			}
+		}
+
+		private bool IsAutodocumentedConstructor()
+		{
+			if (CName == ".ctor") {
+				var argCount = Enumerable.Count (MemberElement.XPathSelectElements ("Parameters/Parameter"));
+				switch (argCount) {
+				case 0: //Default .ctor
+					return true;
+				case 1:
+					//IntPtr
+					if (Enumerable.Count (MemberElement.XPathSelectElements ("Parameters/Parameter[@Type='System.IntPtr']")) == 1) {
+						return true;
+					}
+					//NSCoder
+					if (Enumerable.Count (MemberElement.XPathSelectElements ("Parameters/Parameter[@Type='MonoTouch.Foundation.NSCoder']")) == 1) {
+						return true;
+					}
+					//NSObjectFlag
+					if (Enumerable.Count (MemberElement.XPathSelectElements ("Parameters/Parameter[@Type='MonoTouch.Foundation.NSObjectFlag']")) == 1) {
+						return true;
+					}
+					return false;
+				default : 
+					return false;
+				}
+			}
+			return false;
+		}
+
+		private bool IsClassHandle ()
+		{
+			return CName == "ClassHandle";;
+		}
+
+		private bool IsAutodocumentedAppearance ()
+		{
+			return CName == "Appearance" | CName == "AppearanceWhenContainedIn";
+		}
+
+		private bool IsNotificationProperty ()
+		{
+			return 
+				CName.EndsWith("Notification") 
+				&& MemberElement.XPathSelectElement("ReturnValue/ReturnType").Value == "MonoTouch.Foundation.NSString";
+		}
+
+		private bool IsDelegateProperty ()
+		{
+			return CName == "Delegate";
+		}
+
+		private bool IsWeakDelegateProperty ()
+		{
+			return CName == "WeakDelegate";
+		}
+
+		private bool IsDisposeOrFinalizer ()
+		{
+			//TODO: Confirm Finalizer name
+			return CName == "Dispose" | CName == "Finalize"; 
+		}
+
+		public override bool IsAutodocumented {
+			get {
+				return
+				IsAutodocumentedConstructor ()
+				| IsClassHandle ()
+				| IsAutodocumentedAppearance ()
+				| IsNotificationProperty ()
+				| IsDelegateProperty ()
+				| IsWeakDelegateProperty ()
+				| IsDisposeOrFinalizer ();
 			}
 		}
 	}

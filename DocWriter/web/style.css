@@ -97,3 +97,7 @@ table, td, tr {
 	font-style: italic;
 	color: #0B802D;
 }
+
+.autodocumented {
+	color : #FF0000;
+}

@@ -11,6 +11,13 @@
 	  <div style="font-size:80%;">@Model.Kind</div>
 	  <div style="font-size:80%;" class="title-code">@Model.SignatureHtml</div>
   </div>
+ 
+  @if (@Model.IsAutodocumented) { 
+  	<div class="autodocumented">
+	    This documentation is automatically generated. Do not override without cause.
+	</div>
+  }
+	
   <div class="title">Summary: <span id="summary-status"></span></div>
   <div class='edit' id='summary' contenteditable='true'>@{WriteLiteral (Model.GetHtmlForNode ("Docs/summary"));}</div>
   @if (Model.Params.Count () > 0){

@@ -89,7 +89,36 @@ WriteLiteral(">");
 
 #line default
 #line hidden
-WriteLiteral("</div>\n  </div>\n  <div");
+WriteLiteral("</div>\n  </div>\n \n");
+
+
+#line 15 "MemberTemplate.cshtml"
+  
+
+#line default
+#line hidden
+
+#line 15 "MemberTemplate.cshtml"
+   if (@Model.IsAutodocumented) { 
+
+
+#line default
+#line hidden
+WriteLiteral("  \t<div");
+
+WriteLiteral(" class=\"autodocumented\"");
+
+WriteLiteral(">\n\t    This documentation is automatically generated. Do not override without cau" +
+"se.\n\t</div>\n");
+
+
+#line 19 "MemberTemplate.cshtml"
+  }
+
+
+#line default
+#line hidden
+WriteLiteral("\t\n  <div");
 
 WriteLiteral(" class=\"title\"");
 
@@ -108,7 +137,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 15 "MemberTemplate.cshtml"
+#line 22 "MemberTemplate.cshtml"
                                                           WriteLiteral (Model.GetHtmlForNode ("Docs/summary"));
 
 #line default
@@ -116,13 +145,13 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 16 "MemberTemplate.cshtml"
+#line 23 "MemberTemplate.cshtml"
   
 
 #line default
 #line hidden
 
-#line 16 "MemberTemplate.cshtml"
+#line 23 "MemberTemplate.cshtml"
    if (Model.Params.Count () > 0){
 
 
@@ -135,7 +164,7 @@ WriteLiteral(" class=\"title\"");
 WriteLiteral(">Parameters:</div>\n");
 
 
-#line 18 "MemberTemplate.cshtml"
+#line 25 "MemberTemplate.cshtml"
   	foreach (var p in Model.Params){ 
   	   var name = p.Attribute ("name").Value; var paramid = "param-" + name;
 
@@ -149,7 +178,7 @@ WriteLiteral(" class=\"parameter-name\"");
 WriteLiteral(">");
 
 
-#line 20 "MemberTemplate.cshtml"
+#line 27 "MemberTemplate.cshtml"
                              Write(name);
 
 
@@ -159,7 +188,7 @@ WriteLiteral("<span");
 
 WriteAttribute ("id", " id=\"", "\""
 
-#line 20 "MemberTemplate.cshtml"
+#line 27 "MemberTemplate.cshtml"
           , Tuple.Create<string,object,bool> ("", paramid
 
 #line default
@@ -177,7 +206,7 @@ WriteLiteral(" contenteditable=\'true\'");
 
 WriteAttribute ("id", " id=\"", "\""
 
-#line 21 "MemberTemplate.cshtml"
+#line 28 "MemberTemplate.cshtml"
                           , Tuple.Create<string,object,bool> ("", paramid
 
 #line default
@@ -187,7 +216,7 @@ WriteAttribute ("id", " id=\"", "\""
 WriteLiteral(">");
 
 
-#line 21 "MemberTemplate.cshtml"
+#line 28 "MemberTemplate.cshtml"
                                                                              WriteLiteral (Model.ToHtml (p));
 
 #line default
@@ -195,7 +224,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 22 "MemberTemplate.cshtml"
+#line 29 "MemberTemplate.cshtml"
   	}
   }
 
@@ -205,7 +234,7 @@ WriteLiteral("</div>\n");
 WriteLiteral("  ");
 
 
-#line 24 "MemberTemplate.cshtml"
+#line 31 "MemberTemplate.cshtml"
    if (Model.Value != null){
 
 
@@ -232,7 +261,7 @@ WriteLiteral(" id=\'value\'");
 WriteLiteral(">");
 
 
-#line 26 "MemberTemplate.cshtml"
+#line 33 "MemberTemplate.cshtml"
                                                                  WriteLiteral (Model.ToHtml (Model.Value));
 
 #line default
@@ -240,7 +269,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 27 "MemberTemplate.cshtml"
+#line 34 "MemberTemplate.cshtml"
   }
 
 
@@ -249,7 +278,7 @@ WriteLiteral("</div>\n");
 WriteLiteral("  ");
 
 
-#line 28 "MemberTemplate.cshtml"
+#line 35 "MemberTemplate.cshtml"
    if (Model.ReturnValue != null){
 
 
@@ -276,7 +305,7 @@ WriteLiteral(" id=\'return\'");
 WriteLiteral(">");
 
 
-#line 30 "MemberTemplate.cshtml"
+#line 37 "MemberTemplate.cshtml"
                                                                    WriteLiteral (Model.ToHtml (Model.ReturnValue));
 
 #line default
@@ -284,7 +313,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 31 "MemberTemplate.cshtml"
+#line 38 "MemberTemplate.cshtml"
   }
 
 
@@ -293,7 +322,7 @@ WriteLiteral("</div>\n");
 WriteLiteral("  ");
 
 
-#line 32 "MemberTemplate.cshtml"
+#line 39 "MemberTemplate.cshtml"
    if (Model.Remarks != null){
 
 
@@ -320,7 +349,7 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 34 "MemberTemplate.cshtml"
+#line 41 "MemberTemplate.cshtml"
                                                            WriteLiteral (Model.GetHtmlForNode ("Docs/remarks"));
 
 #line default
@@ -328,7 +357,7 @@ WriteLiteral(">");
 WriteLiteral("</div>\n");
 
 
-#line 35 "MemberTemplate.cshtml"
+#line 42 "MemberTemplate.cshtml"
   }
 
 

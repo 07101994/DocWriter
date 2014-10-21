@@ -175,7 +175,7 @@ it is just hardcoded to "N:".
 Wanted:
 -------
 
-- [ ] Flag members that are auto-documented as such, to now waste documenters time on it.
+- [X] Flag members that are auto-documented as such, to now waste documenters time on it.
 
 
 Handle Clicks on Links

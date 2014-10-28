@@ -108,7 +108,15 @@ Commands:
 Bugs
 ----
 
-Inserting an Example after an Example nests the example. (Command-E twice)
+When navigating to a property
+(monoTouch.AudioToolbox.AudioChannelBit), if you click on the linked
+"Bitmap", it actually *alters* the value of the target node's
+container (in this case, it changes the contents of
+AuiodChannelLayout)
+
+
+Inserting an Example after an Example nests the example. (Command-E
+twice)
 
 It is not possible to add text after an Example.  Perhaps we need to
 insert a spare div to allow editing after an example.

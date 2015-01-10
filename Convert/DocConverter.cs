@@ -160,6 +160,7 @@ static class XmlToEcma {
 			case "example":
 			case "related":
 			case "block":
+			case "attribution":
 				return false;
 			case "see":
 			case "img":
@@ -437,6 +438,23 @@ static class XmlToEcma {
 			}
 			foreach (var e in ret)
 				yield return e;
+		} else if (dclass == "attribution"){
+			var attribution = new XElement ("attribution");
+			//"<div class='attribution' contenteditable='false'>Attribution <span class='license'>{0}</span> <span class='from'>{1}</span></div>", license, from);
+
+			foreach (var child in node.ChildNodes) {
+				if (child.Name == "span") {
+					var spanClass = child.Attributes ["class"].Value;
+					if (spanClass == "license")
+						attribution.Add (new XAttribute ("license", child.InnerText));
+					else if (spanClass == "from") {
+						attribution.Add (new XAttribute ("from", child.InnerText));
+					}
+
+				}
+			}
+			attribution.Add (new XAttribute ("modified", "true"));
+			yield return attribution;
 		} else
 			throw new UnsupportedElementException ("Unknown div style: " + dclass);
 	}
@@ -550,7 +568,9 @@ class EcmaToXml {
 				case "c":
 					sb.Append (RenderC (el));
 					break;
-
+				case "attribution":
+					sb.Append (RenderAttribution (el));
+					break;
 				default:
 					Console.WriteLine ("File: {0} node: {1}", currentFile, el);
 					throw new UnsupportedElementException ("No support for handling nodes of type " + el.Name);
@@ -577,6 +597,17 @@ class EcmaToXml {
 		var type = el.Attribute ("type").Value;
 		var href = el.Attribute ("href").Value;
 		return string.Format ("<div class='related'>Related: <a data-type='{0}' href='{1}'>{2}</a></div>", type, href, HttpUtility.HtmlEncode (el.Value));
+	}
+
+	//<attribution license="cc4" from="Microsoft" modified="false" />
+	// contenteditable='false'
+	string RenderAttribution (XElement el)
+	{
+		var license = el.Attribute ("license").Value;
+		var from = el.Attribute ("from").Value;
+		var modified = el.Attribute ("modified").Value;
+
+		return String.Format ("<div class='attribution' contenteditable='false'>Attribution <span class='license'>{0}</span> <span class='from'>{1}</span></div>", license, from);
 	}
 
 	string RenderList (XElement el)

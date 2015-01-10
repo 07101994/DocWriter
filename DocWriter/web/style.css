@@ -101,3 +101,13 @@ table, td, tr {
 .autodocumented {
 	color : #FF0000;
 }
+
+.attribution {
+	font-style: italic;
+	background-color: #ed4;
+	border-color: #999;
+	border-width: 1px;
+	border-style: solid;
+	padding: 10px 1em;
+	float: right;
+}

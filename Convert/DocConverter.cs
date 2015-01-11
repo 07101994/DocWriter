@@ -57,8 +57,13 @@ public static class DocConverter {
 	/// <param name="currentFile">Message hint used when reporting warnings.</param>
 	public static string ToHtml (XElement rootNode, string currentFile, string baseXmlPath)
 	{
-		var ret = new EcmaToXml (currentFile, baseXmlPath).Convert (rootNode);
-		return ret;
+		try {
+			var ret = new EcmaToXml (currentFile, baseXmlPath).Convert (rootNode);
+			return ret;
+		} catch (Exception e){
+			Console.WriteLine ("Failure to convert {0}", e);
+			return "";
+		}
 	}
 }
 
@@ -488,6 +493,9 @@ class EcmaToXml {
 		bool first = true;
 		bool renderedText = false;
 
+		if (root == null)
+			Console.WriteLine ("oops");
+
 		foreach (var node in root.Nodes ()) {
 			if (node is XText){
 				if (first) {
@@ -636,7 +644,13 @@ class EcmaToXml {
 	// <term>..</term><description>..</description>+
 	string RenderTableElement (string kind, XElement top)
 	{
+		var item = top.Element ("item");
+		if (item != null)
+			top = item;
+
 		var sb = new StringBuilder ();
+		var j = top.Element ("term");
+		var k = top.Element ("item");
 		sb.AppendFormat ("<tr>\n  <{0}>{1}</{0}>", kind, Convert (top.Element ("term")));
 
 		foreach (var desc in top.Elements ("description"))
@@ -698,7 +712,7 @@ class EcmaToXml {
 				} else if (xel.Name == "typeparamref") {
 					sb.Append (RenderTypeParamRef (xel));
 				} else if (xel.Name == "example") {
-					Console.WriteLine ("EXAMPLE at {0}", currentFile);
+					Console.WriteLine ("Warning: <example> node inside a <para>, move out {0}", currentFile);
 				} else if (xel.Name == "code") {
 					sb.Append (RenderCode (xel));
 				} else {
@@ -714,8 +728,13 @@ class EcmaToXml {
 
 	string RenderImage (XElement xel)
 	{
-		var target = xel.Attribute ("href").Value;
-		return string.Format ("<img src='{0}'>", Path.Combine (baseXmlPath, "_images", target));
+		try {
+			var target = xel.Attribute ("href").Value;
+			return string.Format ("<img src='{0}'>", Path.Combine (baseXmlPath, "_images", target));
+		} catch {
+			Console.WriteLine ("Error processing element: {0}", xel);
+			throw;
+		}
 	}
 
 	string RenderParamRef (XElement xel)
@@ -752,6 +771,8 @@ class EcmaToXml {
 				sb.Append ("<li></li>");
 			else if (first.Name == "term")
 				sb.AppendFormat ("<li>{0}</li>", Convert (first));
+			else if (first.Name == "para")
+				sb.AppendFormat ("<p>{0}</p>", RenderPara (first.Elements ()));
 			else
 				throw new UnsupportedElementException ("Do not support anything but a term inside a list[bullet]/item");
 		}
@@ -772,6 +793,10 @@ class EcmaToXml {
 
 	string RenderCode (XElement code)
 	{
+		if (code.Attribute ("lang") == null) {
+			return RenderC (code);
+		}
+
 		var blang = code.Attribute ("lang").Value;
 		var lang = blang.Replace ("#", "sharp");
 		if (lang == "")

@@ -21,16 +21,6 @@ public class TestDriver
 		string start = "UITableView.xml";
 		bool started = true;
 
-#if debug || true
-		var e = XDocument.Load ("/tmp/fox1");
-		var he = DocConverter.ToHtml (e.Root, "fox1");
-		var xe = DocConverter.ToXml (he).ToArray ();
-		Console.WriteLine (e.ToString ());
-		foreach (var x in xe)
-			Console.Write (x.ToString ());
-		Console.WriteLine ();
-#endif
-
 		foreach (var dir in Directory.GetDirectories (path)) {
 			foreach (var file in Directory.GetFiles (dir, "*.xml")){
 				if (file.EndsWith (start))
@@ -39,6 +29,7 @@ public class TestDriver
 					continue;
 
 				currentFile = file;
+
 				var d = XDocument.Load (file);
 				if (d.Element ("Type") == null)
 					continue;
@@ -72,7 +63,7 @@ public class TestDriver
 		foreach (var element in elements) { 
 			var str = element.ToString ();
 			//Console.WriteLine (str);
-			var html = DocConverter.ToHtml (element, currentFile);
+			var html = DocConverter.ToHtml (element, currentFile, Path.GetDirectoryName (path));
 			var ret = DocConverter.ToXml (html);
 
 			var sb = new StringBuilder ();
@@ -110,7 +101,7 @@ public class TestDriver
 
 							// We redo the steps above, purely as it is easier to debug what happened right after 
 							// the error is reported.
-							html = DocConverter.ToHtml (element, currentFile);
+							html = DocConverter.ToHtml (element, currentFile, Path.GetDirectoryName (path));
 							ret = DocConverter.ToXml (html);
 							found = true;
 							break;

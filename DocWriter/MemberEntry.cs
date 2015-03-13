@@ -54,7 +54,7 @@ namespace DocWriter
 
 		void HandleEditingEnded (object sender, EventArgs e)
 		{
-			Ok ();
+			Ok (null);
 		}
 
 		void HandleChanged (object sender, EventArgs e)
@@ -92,7 +92,7 @@ namespace DocWriter
 		}
 
 		[Export ("ok:")]
-		void Ok ()
+		void Ok (NSObject sender)
 		{
 			var v = textField.StringValue;
 

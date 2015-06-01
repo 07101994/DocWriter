@@ -27,14 +27,12 @@ namespace DocWriter
 		// Called when created from unmanaged code
 		public MainWindow (IntPtr handle) : base (handle)
 		{
-			Initialize ();
 		}
 		
 		// Called when created directly from a XIB file
 		[Export ("initWithCoder:")]
 		public MainWindow (NSCoder coder) : base (coder)
 		{
-			Initialize ();
 		}
 
 		public string Path {
@@ -43,16 +41,11 @@ namespace DocWriter
 			}
 		}
 
-		// Shared initialization code
-		void Initialize ()
-		{
-			DocModel = new DocModel (Path);
-		}
-
-
 		public override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
+
+			DocModel = new DocModel (Path);
 
 			outline.DataSource = new DocumentTreeDataSource (DocModel);
 			outline.Delegate = new DocumentTreeDelegate (this);

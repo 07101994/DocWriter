@@ -61,16 +61,64 @@ WriteLiteral(">");
 
 #line default
 #line hidden
+WriteLiteral("</div>\n  <div");
+
+WriteLiteral(" class=\"title\"");
+
+WriteLiteral(">Summary:<span");
+
+WriteLiteral(" id=\"summary-status\"");
+
+WriteLiteral("></span></div>\n  <div");
+
+WriteLiteral(" class=\'edit\'");
+
+WriteLiteral(" id=\'summary\'");
+
+WriteLiteral(" contenteditable=\'true\'");
+
+WriteLiteral(">");
+
+
+#line 13 "NamespaceTemplate.cshtml"
+                                                          WriteLiteral (Model.SummaryHtml);
+
+#line default
+#line hidden
+WriteLiteral("</div>\n  <div");
+
+WriteLiteral(" class=\"title\"");
+
+WriteLiteral(">Remarks:<span");
+
+WriteLiteral(" id=\"remarks-status\"");
+
+WriteLiteral("></span></div>\n  <div");
+
+WriteLiteral(" class=\'edit\'");
+
+WriteLiteral(" id=\'remarks\'");
+
+WriteLiteral(" contenteditable=\'true\'");
+
+WriteLiteral(">");
+
+
+#line 15 "NamespaceTemplate.cshtml"
+                                                          WriteLiteral (Model.RemarksHtml);
+
+#line default
+#line hidden
 WriteLiteral("</div>\n");
 
 
-#line 12 "NamespaceTemplate.cshtml"
+#line 16 "NamespaceTemplate.cshtml"
   
 
 #line default
 #line hidden
 
-#line 12 "NamespaceTemplate.cshtml"
+#line 16 "NamespaceTemplate.cshtml"
    for (int n = 0; n < Model.NodeCount; n++){
 
 
@@ -83,8 +131,8 @@ WriteLiteral(" class=\"title\"");
 WriteLiteral(">");
 
 
-#line 13 "NamespaceTemplate.cshtml"
-                 Write(Model[n].KindHtml);
+#line 17 "NamespaceTemplate.cshtml"
+                  Write(Model[n].KindHtml);
 
 
 #line default
@@ -94,8 +142,8 @@ WriteLiteral(" <a");
 WriteAttribute ("href", " href=\'", "\'"
 , Tuple.Create<string,object,bool> ("", "ecma://T:", true)
 
-#line 13 "NamespaceTemplate.cshtml"
-                    , Tuple.Create<string,object,bool> ("", Model[n].FullName
+#line 17 "NamespaceTemplate.cshtml"
+                     , Tuple.Create<string,object,bool> ("", Model[n].FullName
 
 #line default
 #line hidden
@@ -104,8 +152,8 @@ WriteAttribute ("href", " href=\'", "\'"
 WriteLiteral(">");
 
 
-#line 13 "NamespaceTemplate.cshtml"
-                                                                          Write(Model[n].Name);
+#line 17 "NamespaceTemplate.cshtml"
+                                                                           Write(Model[n].Name);
 
 
 #line default
@@ -115,8 +163,8 @@ WriteLiteral("</a><span");
 WriteAttribute ("id", " id=\"", "\""
 , Tuple.Create<string,object,bool> ("", "summary-", true)
 
-#line 13 "NamespaceTemplate.cshtml"
-                                                                            , Tuple.Create<string,object,bool> ("", n
+#line 17 "NamespaceTemplate.cshtml"
+                                                                             , Tuple.Create<string,object,bool> ("", n
 
 #line default
 #line hidden
@@ -132,7 +180,7 @@ WriteLiteral(" class=\"edit\"");
 WriteAttribute ("id", " id=\"", "\""
 , Tuple.Create<string,object,bool> ("", "summary-", true)
 
-#line 14 "NamespaceTemplate.cshtml"
+#line 18 "NamespaceTemplate.cshtml"
 , Tuple.Create<string,object,bool> ("", n
 
 #line default
@@ -144,15 +192,15 @@ WriteLiteral(" contenteditable=\'true\'");
 WriteLiteral(">");
 
 
-#line 14 "NamespaceTemplate.cshtml"
-                                                              WriteLiteral (Model [n].SummaryHtml);
+#line 18 "NamespaceTemplate.cshtml"
+                                                               WriteLiteral (Model [n].SummaryHtml);
 
 #line default
 #line hidden
 WriteLiteral("</div>\n");
 
 
-#line 15 "NamespaceTemplate.cshtml"
+#line 19 "NamespaceTemplate.cshtml"
   }
 
 

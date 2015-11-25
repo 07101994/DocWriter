@@ -82,6 +82,29 @@ namespace DocWriter
 			return true;
 		}
 
+		public static bool SaveXDocument (XDocument doc, string path, out string error)
+		{
+			error = null;
+			try {
+				var s = new XmlWriterSettings () {
+					Indent = true,
+					Encoding = new UTF8Encoding (false),
+					OmitXmlDeclaration = true,
+					NewLineChars = Environment.NewLine
+				};
+				using (var stream = File.Create (path)){
+					using (var xmlw = XmlWriter.Create (stream, s)){
+						doc.Save (xmlw);
+					}
+					stream.Write (new byte [] { 10 }, 0, 1);
+				} 
+				return true;
+			} catch (Exception e){
+				error = e.ToString ();
+				return false;
+			}
+		}
+
 		// Validates that the elements named in 'args' in WebKit can be converted
 		// from HTML back into ECMA XML.
 		//
@@ -402,25 +425,7 @@ namespace DocWriter
 
 		public bool SaveDoc (out string error)
 		{
-			error = null;
-			try {
-				var s = new XmlWriterSettings () {
-					Indent = true,
-					Encoding = new UTF8Encoding (false),
-					OmitXmlDeclaration = true,
-					NewLineChars = Environment.NewLine
-				};
-				using (var stream = File.Create (path)){
-					using (var xmlw = XmlWriter.Create (stream, s)){
-						doc.Save (xmlw);
-					}
-					stream.Write (new byte [] { 10 }, 0, 1);
-				} 
-				return true;
-			} catch (Exception e){
-				error = e.ToString ();
-				return false;
-			}
+			return SaveXDocument (doc, path, out error);
 		}
 
 		public bool Save (IWebView webView, out string error)
@@ -475,7 +480,9 @@ namespace DocWriter
 	public class DocNamespace : DocNode, IHtmlRender, IEditableNode {
 		Dictionary<string,string> dirtyNodes = new Dictionary<string, string>();
 		SortedList<string,DocType> docs = new SortedList<string, DocType> ();
-		string path;
+		XDocument nsDoc;
+		XElement root;
+		string path, nsPath;
 
 		public DocNamespace (string path)
 		{
@@ -483,6 +490,17 @@ namespace DocWriter
 			Name = new NSString (Path.GetFileName (path));
 			foreach (var file in Directory.GetFiles (path, "*.xml")){
 				docs [Path.GetFileName (file)] = null;
+			}
+			nsPath = Path.Combine (Path.GetDirectoryName (path), "ns-" + Path.GetFileName (path) + ".xml");
+			if (File.Exists (nsPath)) {
+				Console.WriteLine ("Loading {0}", nsPath);
+				try {
+					nsDoc = XDocument.Load (nsPath);
+					root = nsDoc.Root;
+				} catch (Exception e) {
+					Console.WriteLine ("Failed to load " + nsPath + e);
+					nsDoc = null;
+				}
 			}
 		}
 		public int NodeCount {
@@ -538,6 +556,23 @@ namespace DocWriter
 					}
 				}
 			}
+			if (nsDoc != null) {
+				bool dirtyNS = false;
+				if (dirtyNodes.ContainsKey ("summary")) {
+					dirtyNS = true;
+					if (!UpdateNode (webView, root, "/Namespace/Docs/summary", "summary", out error))
+						return false;
+				}
+				if (dirtyNodes.ContainsKey ("remarks")) {
+					dirtyNS = true;
+					if (!UpdateNode (webView, root, "/Namespace/Docs/remarks", "remarks", out error))
+						return false;
+				}
+				if (dirtyNS) {
+					if (!SaveXDocument (nsDoc, nsPath, out error))
+						return false;
+				}
+			}
 			dirtyNodes.Clear ();
 			return true;
 		}
@@ -553,6 +588,24 @@ namespace DocWriter
 				return path;
 			}
 		}
+
+		public string SummaryHtml {
+			get {
+				if (root == null)
+					return "Missing namespace documentation file";
+				return GetHtmlForNode (root, "/Namespace/Docs/summary");
+			}
+		}
+
+		public string RemarksHtml {
+			get {
+				if (root == null)
+					return "Missing namespace documentation file";
+				var x =  GetHtmlForNode (root, "/Namespace/Docs/remarks");
+				return x;
+			}
+		}
+
 	}
 
 	// Loads the documentation from disk, on demand.

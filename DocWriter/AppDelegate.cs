@@ -25,7 +25,7 @@ namespace DocWriter
 
 			var dirs = NSUserDefaults.StandardUserDefaults.StringArrayForKey ("LoadedDirectories");
 			if (dirs != null && dirs.Length > 0) {
-				foreach (var d in dirs.Distinct ()) {
+				foreach (var d in dirs.Distinct ().Where (x=>File.Exists (x))) {
 					OpenDir (d);
 				}
 				if (windows.Count == 0)

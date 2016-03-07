@@ -22,7 +22,7 @@ namespace DocWriter
 	public partial class MainWindow : MonoMac.AppKit.NSWindow, IWebView
 	{
 		public DocModel DocModel;
-		bool loading;
+		bool ready;
 
 		// Called when created from unmanaged code
 		public MainWindow (IntPtr handle) : base (handle)
@@ -66,6 +66,7 @@ namespace DocWriter
 			}
 			webView.DecidePolicyForNavigation += HandleDecidePolicyForNavigation;
 			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
+			ready = true;
 		}
 	
 		void HandleDecidePolicyForNavigation (object sender, MonoMac.WebKit.WebNavigationPolicyEventArgs e)
@@ -230,6 +231,9 @@ namespace DocWriter
 
 		public void SaveCurrentObject ()
 		{
+			if (!ready)
+				return;
+			
 			var editable = currentObject as IEditableNode;
 			if (editable != null) {
 				string error;

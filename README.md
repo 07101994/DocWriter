@@ -65,11 +65,15 @@ It is recommended that you restart the app after a push/rebase, or you
 risk losing data.  Because the app does not reload files that are
 modified/altered behind its back.
 
-5. Done!
---------
+Done!
+------
+
+And you are done!
 
 TODO: 
 -----
+
+Some features that I would like to add to DocWriter:
 
 - [ ] Member Lookup UI (see below)
 - [ ] Support for editing delegates 

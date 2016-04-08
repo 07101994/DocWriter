@@ -7,12 +7,12 @@ Desktop Editor for the ECMA XML Documentation.
 How to use it:
 ==============
 
-1. Checkout your docs
+Checkout your docs
 ---------------------
 
 Checkout your documentation from Git.
 
-2. Launch the App
+Launch the App
 -----------------
 
 Start the application, you will be prompted to open a directory,
@@ -23,14 +23,14 @@ Then select on the left side the node that you want to write
 documentation for.  Then click on the right side (or tab) to start
 editing the documentation.
 
-3. Make Edits
+Make Edits
 -------------
 
 Changes are automatically saved when you switch from one page to
 another.  That said, for the paranoid among us, you can hit Command-S
 to save.
 
-## Editing
+### Editing
 
 Both the Edit and the Format menu contains a few useful commands to
 spice up your documentation.  From adding lists, tables, examples,
@@ -39,13 +39,13 @@ words or parameters.
 
 Support for images is included.
 
-## Formatting
+### Formatting
 
 In the Format menu there are commands that act on the selection, and
 they are typically used to flag a word as a language word, a word to
 be a parameter reference or a type reference (for generic methods).
 
-## Links
+### Links
 
 Use Command-R to insert a reference, this will insert a template of a
 ECMA type reference, that you can then edit to point to the actual
@@ -53,7 +53,7 @@ element you want (remember, you need things like T:System.String,
 M:System.Console.WriteLine and so on).
 
 
-4. Commit
+Commit
 ---------
 
 Once you are happy, quit the app, and do a git commit, and push/rebase

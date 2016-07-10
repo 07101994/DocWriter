@@ -50,6 +50,23 @@ function selectionToCode(cname)
 	}
 }
 
+//
+// Returns true if the specified node is in a editable content section
+// either itself, or one of its parents
+//
+function editableNode (jnode)
+{
+    for (;jnode; jnode = jnode.parent ()){
+    	if ($(jnode).hasClass ("edit")){
+    		return true;
+    	} 
+    	if (jnode.is ("body"))
+    	    return false;
+    }
+    return false;
+
+}
+
 // Use this to add stuff after the current node, for example to
 // add a table, or add a div with an example, since it shoudl not 
 // get inlined
@@ -59,7 +76,7 @@ function insertHtmlAfterCurrentNode (html)
 	sel = window.getSelection ()
     if (sel.type == "Caret"	) {
     	
-    	if ($(sel.focusNode).hasClass ("edit"))
+    	if (editableNode ($(sel.focusNode)))
     	   appendon = sel.focusNode;
     	else {
 	        cl = sel.focusNode.parentNode.attributes ["class"]; 

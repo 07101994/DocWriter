@@ -91,10 +91,6 @@
     <Compile Include="AppDelegate.designer.cs">
       <DependentUpon>AppDelegate.cs</DependentUpon>
     </Compile>
-    <Compile Include="DocModel.cs" />
-    <Compile Include="..\Convert\DocConverter.cs">
-      <Link>DocConverter.cs</Link>
-    </Compile>
     <Compile Include="MemberEntry.cs" />
     <Compile Include="MemberEntryController.cs" />
     <Compile Include="MemberEntry.designer.cs">
@@ -114,6 +110,7 @@
     <Compile Include="InsertUrl.designer.cs">
       <DependentUpon>InsertUrl.cs</DependentUpon>
     </Compile>
+    <Compile Include="DocNodeMac.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainWindow.xib" />
@@ -133,6 +130,7 @@
       <LastGenOutput>NamespaceTemplate.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <Import Project="..\DocWriterCore\DocWriterCore.projitems" Label="Shared" Condition="Exists('..\DocWriterCore\DocWriterCore.projitems')" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <AtlasTexture Include="HtmlTemplates\TypeTemplate.cshtml">

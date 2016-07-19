@@ -12,7 +12,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using MonoMac.Foundation;
+//using MonoMac.Foundation;
 using System.Xml;
 using System.Text;
 using System.Web;
@@ -39,18 +39,8 @@ namespace DocWriter
 	}
 
 	// It is an NSObject, because we conveniently stash these in the NSOutlineView
-	public class DocNode : NSObject {
+	public partial class DocNode {
 		public string CName;
-
-		// This is an NSString because we use it as a value that we store in a NSOutlineView
-		NSString _name;
-		public NSString Name { 
-			get { return _name; }
-			set {
-				_name = value;
-				CName = value.ToString ();
-			}
-		}
 
 		public string GetHtmlForNode (XElement element, string xpath)
 		{
@@ -152,6 +142,7 @@ namespace DocWriter
 			return DocConverter.ToHtml (root, "inmemory", DocumentDirectory);
 		}
 	}
+
 
 	// DocMember: renders an ECMA type member (methods, properties, properties, fields)
 	public class DocMember : DocNode, IHtmlRender, IEditableNode {

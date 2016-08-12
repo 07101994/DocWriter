@@ -1,10 +1,9 @@
 ﻿@model DocMember
 <html>
 <head>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="web/editor.js"></script>
-  <link rel="stylesheet" type="text/css" href="web/style.css">
-
+  <script type="text/javascript">@{WriteLiteral (EmbeddedResourceReader.Get ("jquery.min.js"));}</script>
+  <script type="text/javascript">@{WriteLiteral (EmbeddedResourceReader.Get ("editor.js"));}</script>
+  <style>@{WriteLiteral (EmbeddedResourceReader.Get ("style.css"));}</style>
 </head>
 <body>
   <div class="caption">@Model.Name<br>

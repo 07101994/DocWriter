@@ -12,10 +12,15 @@ using System.IO;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using MonoMac.Foundation;
 using System.Xml;
 using System.Text;
 using System.Web;
+
+#if __XAMARIN_MAC__
+using NSObject = MonoMac.Foundation.NSObject;
+#else
+using NSObject = System.Object;
+#endif
 
 namespace DocWriter
 {
@@ -42,9 +47,8 @@ namespace DocWriter
 	public class DocNode : NSObject {
 		public string CName;
 
-		// This is an NSString because we use it as a value that we store in a NSOutlineView
-		NSString _name;
-		public NSString Name { 
+		string _name;
+		public string Name { 
 			get { return _name; }
 			set {
 				_name = value;
@@ -167,7 +171,7 @@ namespace DocWriter
 		{
 			this.Type = type;
 			this.MemberElement = e;
-			Name = new NSString (e.Attribute ("MemberName").Value);
+			Name = e.Attribute ("MemberName").Value;
 			Remarks = e.XPathSelectElement ("Docs/remarks");
 			Params = e.XPathSelectElements ("Docs/param");
 			Value = e.XPathSelectElement ("Docs/value");
@@ -333,7 +337,7 @@ namespace DocWriter
 		{
 			this.path = path;
 			Namespace = ns;
-			Name = new NSString (Path.GetFileNameWithoutExtension (path));
+			Name = Path.GetFileNameWithoutExtension (path);
 			try {
 				doc = XDocument.Load (path);
 				Root = doc.Root;
@@ -487,7 +491,7 @@ namespace DocWriter
 		public DocNamespace (string path)
 		{
 			this.path = path;
-			Name = new NSString (Path.GetFileName (path));
+			Name = Path.GetFileName (path);
 			foreach (var file in Directory.GetFiles (path, "*.xml")){
 				docs [Path.GetFileName (file)] = null;
 			}

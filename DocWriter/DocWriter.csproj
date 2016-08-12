@@ -15,7 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;__XAMARIN_MAC__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -27,11 +27,15 @@
     <CreatePackage>false</CreatePackage>
     <UseRefCounting>false</UseRefCounting>
     <Profiling>false</Profiling>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+    <TlsProvider>Default</TlsProvider>
+    <LinkMode>None</LinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
+    <DebugType></DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>__XAMARIN_MAC__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -44,11 +48,14 @@
     <CreatePackage>true</CreatePackage>
     <UseRefCounting>false</UseRefCounting>
     <Profiling>false</Profiling>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+    <TlsProvider>Default</TlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|AnyCPU' ">
-    <DebugType>full</DebugType>
+    <DebugType></DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\AppStore</OutputPath>
+    <DefineConstants>__XAMARIN_MAC__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -62,6 +69,8 @@
     <EnablePackageSigning>true</EnablePackageSigning>
     <UseRefCounting>false</UseRefCounting>
     <Profiling>false</Profiling>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+    <TlsProvider>Default</TlsProvider>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -77,8 +86,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
-    <Folder Include="web\" />
-    <Folder Include="HtmlTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -91,23 +98,10 @@
     <Compile Include="AppDelegate.designer.cs">
       <DependentUpon>AppDelegate.cs</DependentUpon>
     </Compile>
-    <Compile Include="DocModel.cs" />
-    <Compile Include="..\Convert\DocConverter.cs">
-      <Link>DocConverter.cs</Link>
-    </Compile>
     <Compile Include="MemberEntry.cs" />
     <Compile Include="MemberEntryController.cs" />
     <Compile Include="MemberEntry.designer.cs">
       <DependentUpon>MemberEntry.cs</DependentUpon>
-    </Compile>
-    <Compile Include="HtmlTemplates\TypeTemplate.cs">
-      <DependentUpon>TypeTemplate.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="HtmlTemplates\MemberTemplate.cs">
-      <DependentUpon>MemberTemplate.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="HtmlTemplates\NamespaceTemplate.cs">
-      <DependentUpon>NamespaceTemplate.cshtml</DependentUpon>
     </Compile>
     <Compile Include="InsertUrl.cs" />
     <Compile Include="InsertUrlController.cs" />
@@ -124,25 +118,7 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="packages.config" />
-    <None Include="HtmlTemplates\MemberTemplate.cshtml">
-      <Generator>RazorTemplatePreprocessor</Generator>
-      <LastGenOutput>MemberTemplate.cs</LastGenOutput>
-    </None>
-    <None Include="HtmlTemplates\NamespaceTemplate.cshtml">
-      <Generator>RazorTemplatePreprocessor</Generator>
-      <LastGenOutput>NamespaceTemplate.cs</LastGenOutput>
-    </None>
   </ItemGroup>
+  <Import Project="..\DocWriter.Shared\DocWriter.Shared.projitems" Label="Shared" Condition="Exists('..\DocWriter.Shared\DocWriter.Shared.projitems')" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <AtlasTexture Include="HtmlTemplates\TypeTemplate.cshtml">
-      <Generator>RazorTemplatePreprocessor</Generator>
-      <LastGenOutput>TypeTemplate.cs</LastGenOutput>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AtlasTexture>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="web\editor.js" />
-    <Content Include="web\style.css" />
-  </ItemGroup>
 </Project>

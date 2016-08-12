@@ -181,7 +181,7 @@ namespace DocWriter
 
 			public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn tableColumn, int row)
 			{
-				return me.results [row].Name;
+				return (NSString) me.results [row].Name;
 			}
 		}
 	}

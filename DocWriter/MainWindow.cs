@@ -282,7 +282,7 @@ namespace DocWriter
 			} catch (Exception e){
 				contents = String.Format ("<body><p>Error Loading the contents for the new node<p>Exception:<p><pre>{0}</pre>", System.Web.HttpUtility.HtmlEncode (e.ToString ()));
 			}
-			webView.MainFrame.LoadHtmlString (contents, NSBundle.MainBundle.ResourceUrl);
+			webView.MainFrame.LoadHtmlString (contents, null);
 		}
 
 		static string EscapeHtml (string html)
@@ -389,7 +389,7 @@ namespace DocWriter
 		public override NSObject GetObjectValue (NSOutlineView outlineView, NSTableColumn tableColumn, NSObject item)
 		{
 			if (item is DocNode)
-				return (item as DocNode).Name;
+				return (NSString) (item as DocNode).Name;
 			return new NSString ("Should not happen");
 		}
 	}

@@ -87,8 +87,6 @@ namespace DocWriter
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // TODO: [Settings] load the last selected directory
-            
-            OpenDirectory(@"C:\Projects\SkiaSharp\docs\en");
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

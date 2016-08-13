@@ -26,6 +26,8 @@
       <DependentUpon>TypeTemplate.cshtml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)EmbeddedResourceReader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EditorWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)MemberTemplate.cshtml">

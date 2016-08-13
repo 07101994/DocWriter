@@ -82,7 +82,7 @@ namespace DocWriter
 			}
 			results.Clear ();
 			for (int i = 0; i < docModel.NodeCount; i++) {
-				var name = docModel [i].CName;
+				var name = docModel [i].Name;
 
 				if (name.StartsWith (filter)) {
 					results.Add (docModel [i]);
@@ -120,23 +120,23 @@ namespace DocWriter
 		string FindCommonPrefix ()
 		{
 			Console.WriteLine ("Searching");
-			for (int pl = 0; pl < results [0].CName.Length; pl++) {
-				char c = results [0].CName [pl];
+			for (int pl = 0; pl < results [0].Name.Length; pl++) {
+				char c = results [0].Name [pl];
 
 				for (int i = 1; i < results.Count; i++) {
-					if (pl >= results[i].CName.Length || results[i].CName [pl] != c ) {
-						return results [i].CName.Substring (0, pl);
+					if (pl >= results[i].Name.Length || results[i].Name [pl] != c ) {
+						return results [i].Name.Substring (0, pl);
 					}
 				}
 			}
-			return results [0].CName;
+			return results [0].Name;
 		}
 
 		public override void SendEvent (NSEvent theEvent)
 		{
 			if (theEvent.Type == NSEventType.KeyDown) {
 				if (FirstResponder is NSText && theEvent.KeyCode == 48){
-					if (results.Count > 0  && results [0].CName.Length > 0) {
+					if (results.Count > 0  && results [0].Name.Length > 0) {
 
 						string commonPrefix = FindCommonPrefix ();
 						var url = textField.StringValue;

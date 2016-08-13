@@ -84,7 +84,7 @@ namespace DocWriter
 		}
 
 		public static void InsertReference (this IWebView webView, DocNode docNode, string text = null) {
-			webView.InsertHtml ("<a href=''>T:" + docNode.SuggestTypeRef () + "</a>");
+			webView.InsertHtml ("<a href=''>" + docNode.ReferenceString + "</a>");
 		}
 		
 		public static void InsertImage (this IWebView webView, string target) {

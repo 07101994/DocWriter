@@ -1,4 +1,13 @@
-﻿
+﻿//
+// MainWindowController.cs: contains the handling of the main shell.
+//
+// Author:
+//   Miguel de Icaza (miguel@xamarin.com)
+//   Matthew Leibowitz (matthew.leibowitz@xamarin.com)
+//
+// Copyright 2016 Xamarin Inc
+//
+//
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -129,8 +138,19 @@ namespace DocWriter
 		[Export ("insertList:")]
 		void insertList (NSObject sender) => EditorWindow.InsertList ();
 
-		[Export ("insertReference:")]
-		void insertReference (NSObject sender) => EditorWindow.InsertReference ();
+		[Export("insertReference:")]
+		void insertReference(NSObject sender)
+		{
+			#if false
+			// Work in progress
+			if (mec == null)
+			mec = new MemberEntryController (this);
+			mec.ShowWindow (this);
+			#else
+			EditorWindow.InsertReference ();
+			#endif
+		}
+
 
 		[Export("insertTable:")]
 		void insertTable (NSObject sender) => EditorWindow.InsertTable ();

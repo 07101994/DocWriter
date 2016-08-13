@@ -3,8 +3,9 @@
 //
 // Author:
 //   Miguel de Icaza (miguel@xamarin.com)
+//   Matthew Leibowitz (matthew.leibowitz@xamarin.com)
 //
-// Copyright 2014 Xamarin Inc
+// Copyright 2016 Xamarin Inc
 //
 using System;
 using System.Linq;
@@ -38,16 +39,8 @@ namespace DocWriter
 
 	// It is an NSObject, because we conveniently stash these in the NSOutlineView
 	public class DocNode : NSObject {
-		public string CName;
-
-		string _name;
-		public string Name { 
-			get { return _name; }
-			set {
-				_name = value;
-				CName = value.ToString ();
-			}
-		}
+		
+		public string Name { get; set; }
 
 		public string GetHtmlForNode (XElement element, string xpath)
 		{
@@ -150,19 +143,11 @@ namespace DocWriter
 		}
 
 		// Suggests a name for the reference based on the current context
-		public string SuggestTypeRef() {
-			var cns = this as DocNamespace;
-			if (cns != null)
-				return cns.Name;
-			var ctype = this as DocType;
-			if (ctype != null)
-				return ctype.Namespace.Name + "." + ctype.Name;
-			var cm = this as DocMember;
-			if (cm != null)
-				return cm.Type.Namespace.Name + "." + cm.Type.Name;
-			return "MonoTouch.";
+		public virtual string ReferenceString {
+			get {
+				return "!";
+			}
 		}
-
 	}
 
 	// DocMember: renders an ECMA type member (methods, properties, properties, fields)
@@ -243,7 +228,7 @@ namespace DocWriter
 
 		public override string DocPath {
 			get {
-				return Type.DocPath + "/" + CName;
+				return Type.DocPath + "/" + Name;
 			}
 		}
 
@@ -255,7 +240,7 @@ namespace DocWriter
 
 		private bool IsAutodocumentedConstructor()
 		{
-			if (CName == ".ctor") {
+			if (Name == ".ctor") {
 				var argCount = Enumerable.Count (MemberElement.XPathSelectElements ("Parameters/Parameter"));
 				switch (argCount) {
 				case 0: //Default .ctor
@@ -283,35 +268,35 @@ namespace DocWriter
 
 		private bool IsClassHandle ()
 		{
-			return CName == "ClassHandle";;
+			return Name == "ClassHandle";;
 		}
 
 		private bool IsAutodocumentedAppearance ()
 		{
-			return CName == "Appearance" | CName == "AppearanceWhenContainedIn";
+			return Name == "Appearance" | Name == "AppearanceWhenContainedIn";
 		}
 
 		private bool IsNotificationProperty ()
 		{
 			return 
-				CName.EndsWith("Notification") 
+				Name.EndsWith("Notification") 
 				&& MemberElement.XPathSelectElement("ReturnValue/ReturnType").Value == "MonoTouch.Foundation.NSString";
 		}
 
 		private bool IsDelegateProperty ()
 		{
-			return CName == "Delegate";
+			return Name == "Delegate";
 		}
 
 		private bool IsWeakDelegateProperty ()
 		{
-			return CName == "WeakDelegate";
+			return Name == "WeakDelegate";
 		}
 
 		private bool IsDisposeOrFinalizer ()
 		{
 			//TODO: Confirm Finalizer name
-			return CName == "Dispose" | CName == "Finalize"; 
+			return Name == "Dispose" | Name == "Finalize"; 
 		}
 
 		public override bool IsAutodocumented {
@@ -324,6 +309,15 @@ namespace DocWriter
 				| IsDelegateProperty ()
 				| IsWeakDelegateProperty ()
 				| IsDisposeOrFinalizer ();
+			}
+		}
+
+		public override string ReferenceString {
+			get {
+				var kind = Kind [0];
+				if (kind == 'C')
+					kind = 'M';
+				return $"{kind}:{Type.FullName}.{Name}";
 			}
 		}
 	}
@@ -375,6 +369,12 @@ namespace DocWriter
 				if (members [idx] == null) 
 					members [idx] = new DocMember (this, xml_members [idx]);
 				return members [idx];
+			}
+		}
+
+		public IEnumerable<DocMember> Members {
+			get {
+				return Enumerable.Range (0, NodeCount).Select (idx => this [idx]);
 			}
 		}
 
@@ -479,13 +479,19 @@ namespace DocWriter
 		}
 		public override string DocPath {
 			get {
-				return Namespace.DocPath + "/" + CName;
+				return Namespace.DocPath + "/" + Name;
 			}
 		}
 
 		public override string DocumentDirectory {
 			get {
 				return Namespace.DocumentDirectory;
+			}
+		}
+
+		public override string ReferenceString {
+			get {
+				return $"T:{FullName}";
 			}
 		}
 	}
@@ -530,6 +536,12 @@ namespace DocWriter
 					docs [key] = new DocType (this, Path.Combine (path, key));
 				}
 				return docs.Values [idx];
+			}
+		}
+
+		public IEnumerable<DocType> Types {
+			get {
+				return Enumerable.Range (0, NodeCount).Select (idx => this [idx]);
 			}
 		}
 
@@ -593,7 +605,7 @@ namespace DocWriter
 
 		public override string DocPath {
 			get {
-				return CName;
+				return Name;
 			}
 		}
 
@@ -620,6 +632,11 @@ namespace DocWriter
 			}
 		}
 
+		public override string ReferenceString {
+			get {
+				return $"N:{Name}";
+			}
+		}
 	}
 
 	// Loads the documentation from disk, on demand.
@@ -652,7 +669,78 @@ namespace DocWriter
 			}
 		}
 
+		public IEnumerable<DocNamespace> Namespaces {
+			get {
+				return namespaces;
+			}
+		}
 
+		private static void SplitType (string rest, out string ns, out string type)
+		{
+			var p = rest.LastIndexOf ('.');
+			if (p == -1) {
+				ns = "";
+				type = rest;
+			} else {
+				ns = rest.Substring (0, p);
+				type = rest.Substring (p + 1);
+			}
+		}
+
+		private static void SplitMember (string rest, out string ns, out string type, out string method, bool search_open_parens = false)
+		{
+			int l = rest.Length-1;
+
+			// Look for M:System.Console.WriteLine(object)?
+			if (search_open_parens) {
+				var p = rest.IndexOf ('(');
+				if (p != -1)
+					l = p;
+			}
+			int pp = rest.LastIndexOf ('.', l);
+			SplitType (rest.Substring (0, pp), out ns, out type);
+			method = rest.Substring (pp + 1);
+		}
+
+		// This is not currently very precise, for now, it is just a convenience function, later we need to enforce method call parameters
+		public DocNode ParseReference (string url)
+		{
+			if (url.Length < 3)
+				return null;
+		
+			if (url [1] != ':')
+				return null;
+		
+			var rest = url.Substring (2);
+			string ns, type, member;
+
+			switch (url[0])
+			{
+				case 'N':
+					var docN = Namespaces.FirstOrDefault (n => n.Name == rest);
+					return docN;
+				case 'T':
+					SplitType (rest, out ns, out type);
+					docN = Namespaces.FirstOrDefault (n => n.Name == ns);
+					var docT = docN?.Types.FirstOrDefault (t => t.Name == type);
+					return docT;
+				case 'M':
+				case 'P':
+				case 'E':
+					SplitMember (rest, out ns, out type, out member, search_open_parens: true);
+					docN = Namespaces.FirstOrDefault (n => n.Name == ns);
+					docT = docN?.Types.FirstOrDefault (t => t.Name == type);
+					var docM = docT?.Members.FirstOrDefault (t => t.Name == member);
+					return docM;
+				case 'F':
+					SplitMember (rest, out ns, out type, out member);
+					docN = Namespaces.FirstOrDefault (n => n.Name == ns);
+					docT = docN?.Types.FirstOrDefault (t => t.Name == type);
+					return docT;
+			}
+
+			return null;
+		}
 	}
 }
 

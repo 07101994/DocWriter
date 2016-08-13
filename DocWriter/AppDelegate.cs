@@ -47,7 +47,7 @@ namespace DocWriter
 		public override void WillTerminate (NSNotification notification)
 		{
 			foreach (var wc in windows) {
-				wc.Window.SaveCurrentObject ();
+				wc.EditorWindow.SaveCurrentObject ();
 			}
 			SaveStatus ();
 			quitting = true;
@@ -59,7 +59,7 @@ namespace DocWriter
 		{
 			if (quitting)
 				return;
-			NSUserDefaults.StandardUserDefaults ["LoadedDirectories"] = NSArray.FromStrings (windows.Select (wc => wc.WindowPath).ToArray ());
+			NSUserDefaults.StandardUserDefaults ["LoadedDirectories"] = NSArray.FromStrings (windows.Select (wc => wc.EditorWindow.WindowPath).ToArray ());
 		}
 
 		//

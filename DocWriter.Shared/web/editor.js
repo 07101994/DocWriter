@@ -103,6 +103,17 @@ function getHtml(xid)
     return element.innerHTML;
 }
 
+function getText(xid)
+{
+    if (document == null)
+    	return "<>Odd";
+    element = document.getElementById (xid);
+	if (element === null)
+		return "<<<<It is null and id=" + xid;
+
+    return element.text;
+}
+
 // Tracks changes on a content editable node whose name is 'node'
 // and stores the id of the node on chages in the dirty dictionary
 function trackDirty (node)

@@ -55,7 +55,7 @@ namespace DocWriter
 			string title, url;
 
 			Window.GetParams (out title, out url);
-			mwc.InsertUrl (title, url);
+			mwc.EditorWindow.InsertUrl (title, url);
 			Close ();
 		}
 	}

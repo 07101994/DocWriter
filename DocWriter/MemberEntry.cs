@@ -45,7 +45,7 @@ namespace DocWriter
 			textField.EditingEnded += HandleEditingEnded;
 
 			mainWindowController = (this.WindowController as MemberEntryController).mainWindowController;
-			docModel = mainWindowController.Window.DocModel;
+			docModel = mainWindowController.EditorWindow.DocModel;
 
 			PerformFilter ("");
 			tableView.Delegate = new CompleteTableViewDelegate (this);
@@ -101,7 +101,7 @@ namespace DocWriter
 			else
 				v = "N:" + v;
 
-			mainWindowController.InsertReference (v);
+			mainWindowController.EditorWindow.InsertReference (v);
 			Close ();
 		}
 

@@ -32,10 +32,200 @@ namespace DocWriter
 
 	// Interface implemented to lookup the contents of a node
 	public interface IWebView {
-		string Fetch (string id);
-		string RunJS (string code);
+		string RunJS (string functionName, params string[] args);
+	}
+	
+	// Interface implemented to handle operations
+	public interface IEditorWindow : IWebView {
+		// the path and model for these docs
+		string WindowPath { get; }
+		DocModel DocModel { get; }
+
+		// the currently editing object
+		DocNode CurrentObject { get; set; }
+
+		// update the editor
+		void UpdateStatus (string status);
 	}
 
+	public enum SelectionToCodeType {
+		ParamRef,
+		TypeParamRef,
+		LangWord
+	}
+
+	// Extensions to add features and operations
+	public static class Extensions {
+
+		// extensions
+
+		public static string EscapeHtml (string html) {
+			var sb = new StringBuilder ();
+			foreach (char c in html) {
+				if (c == '\n')
+					sb.Append ("\\\n");
+				else
+					sb.Append (c);
+			}
+			return sb.ToString ();
+		}
+		
+		// IWebView extensions
+
+		public static string Fetch (this IWebView webView, string id) {
+			var element = webView.RunJS ("getHtml", id);
+			if (element.StartsWith ("<<<<", StringComparison.OrdinalIgnoreCase)) {
+				Console.WriteLine ("Failure to fetch contents of {0}", id);
+			}
+			return element;
+		}
+
+		public static void InsertSpan (this IWebView webView, string html) {
+			webView.RunJS ("insertSpanAtCursor", EscapeHtml (html));
+		}
+		
+		public static void InsertHtml (this IWebView webView, string html, params object[] args) {
+			webView.InsertSpan (string.Format (html, args));
+		}
+		
+		public static void InsertUrl (this IWebView webView, string caption, string url)
+		{
+			webView.InsertHtml (string.Format ("<div class='verbatim'><a href='{0}'>{1}</a></div>", url, caption));
+		}
+
+		public static void SelectionToCode (this IWebView webView, SelectionToCodeType type) {
+			string codeType = null;
+			switch (type) {
+				case SelectionToCodeType.LangWord:
+					codeType = "langword";
+					break;
+				case SelectionToCodeType.ParamRef:
+					codeType = "paramref";
+					break;
+				case SelectionToCodeType.TypeParamRef:
+					codeType = "typeparamref";
+					break;
+			}
+			if (codeType != null) {
+				webView.RunJS ($"selectionToCode", codeType);
+			}
+		}
+
+		public static void InsertReference (this IWebView webView, DocNode docNode, string text = null) {
+			webView.InsertHtml ("<a href=''>T:" + docNode.SuggestTypeRef () + "</a>");
+		}
+		
+		public static void InsertImage (this IWebView webView, string target) {
+			webView.InsertHtml("<img src='{0}'>", target);
+		}
+
+		// IEditorWindow extensions
+		
+		public static void SaveCurrentObject (this IEditorWindow editorWindow) {
+			var editable = editorWindow.CurrentObject as IEditableNode;
+			if (editable != null) {
+				string error;
+
+				editorWindow.CheckContents ();
+
+				if (!editable.Save (editorWindow, out error)) {
+					// FIXME: popup a window or something.
+				}
+			}
+		}
+
+		public static void InsertTable (this IEditorWindow editorWindow)
+		{
+			var table = new XElement ("list", new XAttribute ("type", "table"),
+			                          new XElement ("listheader", 
+			                                        new XElement ("term", new XText ("Term")),
+			                                        new XElement ("description", new XText ("Description"))),
+			                          new XElement ("item", 
+			                                        new XElement ("term", new XText ("Term1")),
+			                                        new XElement ("description", new XText ("Description1"))),
+			                          new XElement ("item", 
+			                                        new XElement ("term", new XText ("Term2")),
+			                                        new XElement ("description", new XText ("Description2"))));
+			
+			editorWindow.AppendEcmaNode (new XElement ("Host", table));
+		}
+		
+		public static void InsertReference (this IEditorWindow editorWindow, string text = null) {
+			editorWindow.InsertReference (editorWindow.CurrentObject, text);
+		}
+
+		public static void InsertList (this IEditorWindow editorWindow) {
+			var list = new XElement ("list", new XAttribute ("type", "bullet"),
+				new XElement ("item", new XElement ("term", new XText ("Text1"))),
+				new XElement ("item", new XElement ("term", new XText ("Text2"))));
+
+			editorWindow.AppendEcmaNode (new XElement ("host", list));
+		}
+		
+		public static void InsertHtmlH2 (this IEditorWindow editorWindow) {
+			editorWindow.AppendEcmaNode (new XElement ("host", new XElement ("format", new XAttribute ("type", "text/html"), new XElement ("h2", new XText ("Header")))));
+		}
+		
+		public static void InsertCSharpCode (this IEditorWindow editorWindow) {
+			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "C#"), new XCData ("class Sample {")));
+
+			editorWindow.AppendEcmaNode (example);
+			editorWindow.AppendPara ();
+		}
+
+		public static void InsertCSharpExample (this IEditorWindow editorWindow) {
+			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "C#"), new XCData ("class Sample {"))));
+
+			editorWindow.AppendEcmaNode (example);
+			editorWindow.AppendPara ();
+		}
+
+		public static void InsertFSharpCode (this IEditorWindow editorWindow) {
+			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "F#"), new XCData ("let sample = ")));
+
+			editorWindow.AppendEcmaNode (example);
+			editorWindow.AppendPara ();
+		}
+
+		public static void InsertFSharpExample (this IEditorWindow editorWindow) {
+			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "F#"), new XCData ("let sample = "))));
+
+			editorWindow.AppendEcmaNode (example);
+			editorWindow.AppendPara ();
+		}
+
+		public static void AppendPara (this IEditorWindow editorWindow) {
+			editorWindow.AppendEcmaNode (new XElement ("para", new XText (".")));
+		}
+		
+		// Turns the provided ECMA XML node into HTML and appends it to the current node on the rendered HTML
+		public static void AppendEcmaNode (this IEditorWindow editorWindow, XElement ecmaXml) {
+			if (editorWindow.CurrentObject != null) {
+				var html = DocConverter.ToHtml (ecmaXml, "", editorWindow.CurrentObject.DocumentDirectory);
+				editorWindow.RunJS ("insertHtmlAfterCurrentNode", EscapeHtml (html));
+			}
+		}
+		
+		public static void CheckContents (this IEditorWindow editorWindow)
+		{
+			var dirtyNodes = editorWindow.RunJS ("getDirtyNodes").Split (new char [] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+			if (dirtyNodes.Length == 0)
+				return;
+
+			if (editorWindow.CurrentObject != null && editorWindow.CurrentObject is IEditableNode) {
+				string result;
+				try {
+					result = (editorWindow.CurrentObject as IEditableNode).ValidateChanges (editorWindow, dirtyNodes);
+				} catch (Exception e) {
+					result = e.ToString ();
+				}
+
+				editorWindow.UpdateStatus (result ?? "OK");
+			}
+		}
+
+	}
+	
 
 	// Interface implemented by nodes that can provide editing functionality
 	interface IEditableNode {
@@ -155,12 +345,28 @@ namespace DocWriter
 		{
 			return DocConverter.ToHtml (root, "inmemory", DocumentDirectory);
 		}
+
+		// Suggests a name for the reference based on the current context
+		public string SuggestTypeRef() {
+			var cns = this as DocNamespace;
+			if (cns != null)
+				return cns.Name;
+			var ctype = this as DocType;
+			if (ctype != null)
+				return ctype.Namespace.Name + "." + ctype.Name;
+			var cm = this as DocMember;
+			if (cm != null)
+				return cm.Type.Namespace.Name + "." + cm.Type.Name;
+			return "MonoTouch.";
+		}
+
 	}
 
 	// DocMember: renders an ECMA type member (methods, properties, properties, fields)
 	public class DocMember : DocNode, IHtmlRender, IEditableNode {
 		public DocType Type { get; private set; }
 		public XElement MemberElement;
+		public IEnumerable<XElement> MemberParams;
 		public IEnumerable<XElement> Params;
 		public XElement Value;
 		public XElement ReturnValue;
@@ -173,6 +379,7 @@ namespace DocWriter
 			this.MemberElement = e;
 			Name = e.Attribute ("MemberName").Value;
 			Remarks = e.XPathSelectElement ("Docs/remarks");
+			MemberParams = e.XPathSelectElements("Parameters/Parameter");
 			Params = e.XPathSelectElements ("Docs/param");
 			Value = e.XPathSelectElement ("Docs/value");
 			ReturnValue = e.XPathSelectElement ("Docs/returns");

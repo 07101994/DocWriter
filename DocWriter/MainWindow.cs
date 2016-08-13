@@ -19,9 +19,8 @@ using MonoMac.WebKit;
 
 namespace DocWriter
 {
-	public partial class MainWindow : MonoMac.AppKit.NSWindow, IWebView
+	public partial class MainWindow : MonoMac.AppKit.NSWindow, IEditorWindow
 	{
-		public DocModel DocModel;
 		bool ready;
 
 		// Called when created from unmanaged code
@@ -35,24 +34,40 @@ namespace DocWriter
 		{
 		}
 
-		public string Path {
+		public string WindowPath {
 			get {
 				return (WindowController as MainWindowController).WindowPath;
 			}
+		}
+		
+		public DocModel DocModel {
+			get {
+				return (WindowController as MainWindowController).DocModel;
+			}
+		}
+
+		public DocNode CurrentObject { get; set; }
+
+		public void UpdateStatus (string status)
+		{
+			statusLabel.Cell.StringValue = status;
+		}
+
+		public string RunJS (string functionName, params string [] args)
+		{
+			return webView.StringByEvaluatingJavaScriptFromString ($"{functionName}({string.Join (", ", args.Select (a => $"\"{a}\""))})");
 		}
 
 		public override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
 
-			DocModel = new DocModel (Path);
-
 			outline.DataSource = new DocumentTreeDataSource (DocModel);
 			outline.Delegate = new DocumentTreeDelegate (this);
-			Title = "DocWriter - " + Path;
+			Title = "DocWriter - " + WindowPath;
 
 			// Restore the last node
-			var lastOpenedNode = NSUserDefaults.StandardUserDefaults.StringForKey ("currentNode"+Path);
+			var lastOpenedNode = NSUserDefaults.StandardUserDefaults.StringForKey ("currentNode"+WindowPath);
 			if (lastOpenedNode != null) {
 				int nsidx = -1;
 				int typeidx = -1;
@@ -65,7 +80,7 @@ namespace DocWriter
 					SelectMember (nsidx, typeidx, components [2]);
 			}
 			webView.DecidePolicyForNavigation += HandleDecidePolicyForNavigation;
-			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
+			NSTimer.CreateRepeatingScheduledTimer (1, () => this.CheckContents ());
 			ready = true;
 		}
 	
@@ -81,7 +96,7 @@ namespace DocWriter
 				// from the text, not the href attribute value (since this is not easily
 				// editable, and the text is.
 			case "goto":
-				NavigateTo (RunJS ("document.getElementById ('" + e.OriginalUrl.Host + "').text"));
+				NavigateTo (RunJS ("getText", e.OriginalUrl.Host));
 				break;
 			}
 			WebView.DecideUse (e.DecisionToken);
@@ -191,88 +206,19 @@ namespace DocWriter
 			return false;
 		}
 
-		public string RunJS (string code)
-		{
-			return webView.StringByEvaluatingJavaScriptFromString (code);
-		}
-
-		public string Fetch (string id)
-		{
-			var element = RunJS ("getHtml(\"" + id + "\")");
-			if (element.StartsWith ("<<<<")) {
-				Console.WriteLine ("Failure to fetch contents of {0}", id);
-			}
-			return element;
-		}
-
-		NSObject currentObject;
-
-		void CheckContents ()
-		{
-			var dirtyNodes = RunJS ("getDirtyNodes ()").Split (new char [] {' '}, StringSplitOptions.RemoveEmptyEntries);
-			if (dirtyNodes.Length == 0)
-				return;
-
-			if (currentObject != null && currentObject is IEditableNode) {
-				string result;
-
-				try {
-					result = (currentObject as IEditableNode).ValidateChanges (this, dirtyNodes);
-				} catch (Exception e){
-					result = e.ToString ();
-				}
-
-				if (result != null)
-					statusLabel.Cell.StringValue = result;
-				else
-					statusLabel.Cell.StringValue = "OK";
-			}
-		}
-
-		public void SaveCurrentObject ()
-		{
-			if (!ready)
-				return;
-			
-			var editable = currentObject as IEditableNode;
-			if (editable != null) {
-				string error;
-
-				CheckContents ();
-
-				if (!editable.Save (this, out error)) {
-					// FIXME: popup a window or something.
-				}
-			}
-		}
-
-		// Suggests a name for the reference based on the current context
-		public string SuggestTypeRef ()
-		{
-			var cns = currentObject as DocNamespace;
-			if (cns != null)
-				return cns.Name;
-			var ctype = currentObject as DocType;
-			if (ctype != null)
-				return ctype.Namespace.Name + "." + ctype.Name;
-			var cm = currentObject as DocMember;
-			if (cm != null)
-				return cm.Type.Namespace.Name + "." + cm.Type.Name;
-			return "MonoTouch.";
-		}
-
 		void SelectionChanged ()
 		{
-			SaveCurrentObject ();
-			currentObject = null;
+			if (ready) {
+				this.SaveCurrentObject ();
+			}
+			CurrentObject = null;
 
-			currentObject = outline.ItemAtRow (outline.SelectedRow);
-			var docNode = currentObject as DocNode;
-			if (docNode != null) {
-				NSUserDefaults.StandardUserDefaults.SetString (docNode.DocPath, "currentNode"+Path);
+			CurrentObject = outline.ItemAtRow (outline.SelectedRow) as DocNode;
+			if (CurrentObject != null) {
+				NSUserDefaults.StandardUserDefaults.SetString (CurrentObject.DocPath, "currentNode"+WindowPath);
 			}
 
-			var ihtml = currentObject as IHtmlRender;
+			var ihtml = CurrentObject as IHtmlRender;
 			if (ihtml == null)
 				return;
 
@@ -283,46 +229,6 @@ namespace DocWriter
 				contents = String.Format ("<body><p>Error Loading the contents for the new node<p>Exception:<p><pre>{0}</pre>", System.Web.HttpUtility.HtmlEncode (e.ToString ()));
 			}
 			webView.MainFrame.LoadHtmlString (contents, null);
-		}
-
-		static string EscapeHtml (string html)
-		{
-			var sb = new StringBuilder ();
-
-			foreach (char c in html) {
-				if (c == '\n')
-					sb.Append ("\\\n");
-				else
-					sb.Append (c);
-			}
-			return sb.ToString ();
-		}
-
-		public void InsertSpan (string html)
-		{
-			webView.StringByEvaluatingJavaScriptFromString ("insertSpanAtCursor(\"" + EscapeHtml (html) + "\")");
-		}
-
-		//
-		// Turns the provided ECMA XML node into HTML and appends it to the current node on the
-		// rendered HTML.
-		//
-		public void AppendNode (XElement ecmaXml)
-		{
-			DocNode docNode = currentObject as DocNode;
-			if (docNode != null) {
-				var html = DocConverter.ToHtml (ecmaXml, "", docNode.DocumentDirectory);
-				webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAfterCurrentNode(\"" + EscapeHtml (html) + "\")");
-			}
-		}
-
-		public string CurrentNodePath {
-			get {
-				DocNode docNode = currentObject as DocNode;
-				if (docNode == null)
-					return null;
-				return docNode.DocumentDirectory;
-			}
 		}
 
 		class DocumentTreeDelegate : NSOutlineViewDelegate {
@@ -388,6 +294,8 @@ namespace DocWriter
 
 		public override NSObject GetObjectValue (NSOutlineView outlineView, NSTableColumn tableColumn, NSObject item)
 		{
+			if (item is DocMember)
+			return (NSString) ($"{(item as DocMember).Name} ({string.Join(", ", (item as DocMember).MemberParams.Select(p => p.Attribute("Type").Value))})");
 			if (item is DocNode)
 				return (NSString) (item as DocNode).Name;
 			return new NSString ("Should not happen");

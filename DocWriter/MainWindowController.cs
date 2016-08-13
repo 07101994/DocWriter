@@ -12,6 +12,8 @@ namespace DocWriter
 	public partial class MainWindowController : MonoMac.AppKit.NSWindowController
 	{
 		public string WindowPath { get; private set; }
+		
+		public DocModel DocModel { get; private set; }
 
 		public MainWindowController (IntPtr handle) : base (handle)
 		{
@@ -29,6 +31,8 @@ namespace DocWriter
 		public MainWindowController (string path) : base ("MainWindow")
 		{
 			WindowPath = path;
+			DocModel = new DocModel (WindowPath);
+
 			Initialize ();
 		}
 		
@@ -38,81 +42,34 @@ namespace DocWriter
 		}
 
 		//strongly typed window accessor
-		public new MainWindow Window {
+		public IEditorWindow EditorWindow {
 			get {
 				return (MainWindow)base.Window;
 			}
 		}
 
-		void InsertHtml (string html, params object [] args)
-		{
-			Window.InsertSpan (String.Format (html, args));
-		}
-
-
-		void AppendEcmaNode (XElement ecmaXml)
-		{
-			Window.AppendNode (ecmaXml);
-		}
-
-		void AppendPara ()
-		{
-			AppendEcmaNode (new XElement ("para", new XText (".")));
-
-		}
-
 		[Export ("saveDocument:")]
-		void SaveCurrentDocument (NSObject sender)
-		{
-			Window.SaveCurrentObject ();
-		}
+		void SaveCurrentDocument (NSObject sender) => EditorWindow.SaveCurrentObject ();
 
 		[Export ("insertCode:")]
-		void insertCode (NSObject sender)
-		{
-			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "C#"), new XCData ("class Sample {")));
-
-			AppendEcmaNode (example);
-			AppendPara ();
-		}
+		void insertCode (NSObject sender) => EditorWindow.InsertCSharpCode();
 
 		[Export ("insertExample:")]
-		void insertExample (NSObject sender)
-		{
-			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "C#"), new XCData ("class Sample {"))));
-
-			AppendEcmaNode (example);
-			AppendPara ();
-		}
+		void insertExample (NSObject sender) => EditorWindow.InsertCSharpExample ();
 
 		[Export ("insertFCode:")]
-		void insertFCode (NSObject sender)
-		{
-			var example = new XElement ("host", new XElement ("code", new XAttribute ("lang", "F#"), new XCData ("let sample = ")));
-
-			AppendEcmaNode (example);
-			AppendPara ();
-		}
+		void insertFCode (NSObject sender) => EditorWindow.InsertFSharpCode ();
 
 		[Export ("insertFExample:")]
-		void insertFExample (NSObject sender)
-		{
-			var example = new XElement ("host", new XElement ("example", new XElement ("code", new XAttribute ("lang", "F#"), new XCData ("let sample = "))));
-
-			AppendEcmaNode (example);
-			AppendPara ();
-		}
+		void insertFExample (NSObject sender) => EditorWindow.InsertFSharpExample ();
 
 		[Export ("insertH2:")]
-		void InsertH2 (NSObject sender)
-		{
-			AppendEcmaNode (new XElement ("host", new XElement ("format", new XAttribute ("type", "text/html"), new XElement ("h2", new XText ("Header")))));
-		}
+		void InsertH2 (NSObject sender) => EditorWindow.InsertHtmlH2 ();
 
 		[Export ("insertImage:")]
 		void insertImage (NSObject sender)
 		{
-			var nodePath = Window.CurrentNodePath;
+			var nodePath = EditorWindow.CurrentObject?.DocumentDirectory;
 			if (nodePath == null)
 				return;
 			var nodeImageDir = Path.Combine (nodePath, "_images");
@@ -165,58 +122,18 @@ namespace DocWriter
 				a.RunModal ();
 				return;
 			}
-			InsertHtml ("<img src='{0}'>", target);
+
+			EditorWindow.InsertImage (target);
 		}
 
 		[Export ("insertList:")]
-		void insertList (NSObject sender)
-		{
-			var list = new XElement ("list", new XAttribute ("type", "bullet"),
-				new XElement ("item", new XElement ("term", new XText ("Text1"))),
-				new XElement ("item", new XElement ("term", new XText ("Text2"))));
-
-			AppendEcmaNode (new XElement ("host", list));
-		}
-
-		public void InsertReference (string text)
-		{
-			InsertHtml ("<a href=''>T:" + Window.SuggestTypeRef () + "</a>");
-		}
+		void insertList (NSObject sender) => EditorWindow.InsertList ();
 
 		[Export ("insertReference:")]
-		void insertReference (NSObject sender)
-		{
-			#if false
-			// Work in progress
-			if (mec == null)
-			mec = new MemberEntryController (this);
-			mec.ShowWindow (this);
-			#else
-			InsertHtml ("<a href=''>T:{0}</a>", Window.SuggestTypeRef ());
-			#endif
-		}
+		void insertReference (NSObject sender) => EditorWindow.InsertReference ();
 
-		[Export ("insertTable:")]
-		void insertTable (NSObject sender)
-		{
-			var table = new XElement ("list", new XAttribute ("type", "table"),
-				new XElement ("listheader", 
-					new XElement ("term", new XText ("Term")),
-					new XElement ("description", new XText ("Description"))),
-				new XElement ("item", 
-					new XElement ("term", new XText ("Term1")),
-					new XElement ("description", new XText ("Description1"))),
-				new XElement ("item", 
-					new XElement ("term", new XText ("Term2")),
-					new XElement ("description", new XText ("Description2"))));
-
-			AppendEcmaNode (new XElement ("Host", table));
-		}
-
-		public void InsertUrl (string caption, string url)
-		{
-			InsertHtml (string.Format ("<div class='verbatim'><a href='{0}'>{1}</a></div>", url, caption));
-		}
+		[Export("insertTable:")]
+		void insertTable (NSObject sender) => EditorWindow.InsertTable ();
 
 		[Export ("insertUrl:")]
 		void insertUrl (NSObject sender)
@@ -228,23 +145,14 @@ namespace DocWriter
 			urlController.ShowWindow (this);
 		}
 
-		[Export ("selectionToLang:")]
-		void selectionToLang (NSObject sender)
-		{
-			Window.RunJS ("selectionToCode('langword')");
-		}
+		[Export("selectionToLang:")]
+		void selectionToLang (NSObject sender) => EditorWindow.SelectionToCode( SelectionToCodeType.LangWord);
 
 		[Export ("selectionToParam:")]
-		void selectionToParam (NSObject sender)
-		{
-			Window.RunJS ("selectionToCode('paramref')");
-		}
+		void selectionToParam (NSObject sender) => EditorWindow.SelectionToCode (SelectionToCodeType.ParamRef);
 
 		[Export ("selectionToType:")]
-		void selectionToType (NSObject sender)
-		{
-			Window.RunJS ("selectionToCode('typeparamref')");
-		}
+		void selectionToType (NSObject sender) => EditorWindow.SelectionToCode (SelectionToCodeType.TypeParamRef);
 
 	}
 }

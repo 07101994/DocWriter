@@ -9,7 +9,6 @@ function track(element)
     var edit = $(element).closest (".edit");
 	if (edit.length > 0){
 	    dirty [edit [0].id] = edit [0].id;
-	    console.log ("Dirty: " + edit [0].id);
     }
 }
 
@@ -119,15 +118,14 @@ function getText(xid)
 function trackDirty (node)
 {
     var domNode = document.getElementById (node);
-    domNode.addEventListener ("input", function () {
+    $(domNode).bind("input keyup cut paste blur", function () {
 	    dirty [domNode.id] = domNode.id;
 	    if ($(domNode).html () == "To be added."){
 	    	$(domNode).addClass ("to-be-added");
 	    } else {
 			$(domNode).removeClass ("to-be-added");
 		}
-        console.log ("Logging dirty " + domNode.id);
-    }, false);
+    });
 }
 
 function inTable ()
@@ -158,7 +156,6 @@ function moveCursorTo (node,event)
 
 function keypressHandler (event)
 {
-    console.log (event.which)
     ee = event;
 
     //

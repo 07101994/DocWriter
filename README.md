@@ -3,17 +3,38 @@ DocWriter
 
 Desktop Editor for the ECMA XML Documentation.
 
+This editor works on a tree of ECMA XML formatted documentation.   It expects
+the documentation to be structed as the default output of the MonoDoc tooling,
+that is:
+
+* TopLevel Directory
+  * `en/` - This is a subdirectory with the English translation
+     * `ns-Foo.xml`
+     * `Foo/`
+       * `SomeType.xml`
+
+When selecting a directory to document, you have to select the toplevel directory, 
+and the tool will probe for the existence of `en/` directory, and the various
+XML files under that directory structure.
+
+Building it
+===========
+
+There are two user interfaces, one for Mac, and one for Windows.
+
+* Mac: build the DocWriter.sln solution
+* Windows: build the DocWriter.Windows.sln solution
 
 How to use it:
 ==============
 
 Checkout your docs
----------------------
+------------------
 
 Checkout your documentation from Git.
 
 Launch the App
------------------
+--------------
 
 Start the application, you will be prompted to open a directory,
 select the toplevel for your docs, for example
@@ -24,7 +45,7 @@ documentation for.  Then click on the right side (or tab) to start
 editing the documentation.
 
 Make Edits
--------------
+----------
 
 Changes are automatically saved when you switch from one page to
 another.  That said, for the paranoid among us, you can hit Command-S
@@ -54,7 +75,7 @@ M:System.Console.WriteLine and so on).
 
 
 Commit
----------
+------
 
 Once you are happy, quit the app, and do a git commit, and push/rebase
 as necessary.  You should review the changes before committing, just

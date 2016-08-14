@@ -3,27 +3,21 @@
 //
 // Author:
 //   Miguel de Icaza (miguel@xamarin.com)
+//   Matthew Leibowitz (matthew.leibowitz@xamarin.com)
 //
-// Copyright 2014 Xamarin Inc
-//
+// Copyright 2016 Xamarin Inc
 //
 //
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using MonoMac.Foundation;
 using MonoMac.AppKit;
-using System.Text;
-using System.Xml.Linq;
 using MonoMac.WebKit;
 
 namespace DocWriter
 {
-	public partial class MainWindow : MonoMac.AppKit.NSWindow, IWebView
+	public partial class MainWindow : MonoMac.AppKit.NSWindow, INSOutlineViewDelegate, IEditorWindow
 	{
-		public DocModel DocModel;
-		bool ready;
-
 		// Called when created from unmanaged code
 		public MainWindow (IntPtr handle) : base (handle)
 		{
@@ -35,38 +29,75 @@ namespace DocWriter
 		{
 		}
 
-		public string Path {
+		public string WindowPath {
 			get {
 				return (WindowController as MainWindowController).WindowPath;
 			}
+		}
+		
+		public DocModel DocModel {
+			get {
+				return (WindowController as MainWindowController).DocModel;
+			}
+		}
+
+		DocNode currentObject;
+		public DocNode CurrentObject {
+			get { return currentObject; }
+			set {
+				if (currentObject != value) {
+					if (currentObject != null) {
+						this.SaveCurrentObject ();
+					}
+
+					currentObject = value;
+
+					if (currentObject != null) {
+						NSUserDefaults.StandardUserDefaults.SetString (currentObject.ReferenceString, "currentNode" + WindowPath);
+					}
+
+					SelectItem (currentObject);
+
+					var ihtml = currentObject as IHtmlRender;
+					if (ihtml != null) {
+						string contents;
+						try {
+							contents = ihtml.Render ();
+						} catch (Exception ex) {
+							var text = System.Web.HttpUtility.HtmlEncode (ex.ToString ());
+							contents = $"<body><p>Error Loading the contents for the new node<p>Exception:<p><pre>{text}</pre>";
+						}
+						webView.MainFrame.LoadHtmlString (contents, null);
+					}
+				}
+			}
+		}
+
+		public void UpdateStatus (string status)
+		{
+			statusLabel.Cell.StringValue = status;
+		}
+
+		public string RunJS (string functionName, params string [] args)
+		{
+			return webView.StringByEvaluatingJavaScriptFromString ($"{functionName}({string.Join (", ", args.Select (a => $"\"{a}\""))})");
 		}
 
 		public override void AwakeFromNib ()
 		{
 			base.AwakeFromNib ();
 
-			DocModel = new DocModel (Path);
-
 			outline.DataSource = new DocumentTreeDataSource (DocModel);
-			outline.Delegate = new DocumentTreeDelegate (this);
-			Title = "DocWriter - " + Path;
+			outline.WeakDelegate = this;
+			Title = "DocWriter - " + WindowPath;
 
 			// Restore the last node
-			var lastOpenedNode = NSUserDefaults.StandardUserDefaults.StringForKey ("currentNode"+Path);
+			var lastOpenedNode = NSUserDefaults.StandardUserDefaults.StringForKey ("currentNode"+WindowPath);
 			if (lastOpenedNode != null) {
-				int nsidx = -1;
-				int typeidx = -1;
-				var components = lastOpenedNode.Split ('/');
-				if (components.Length > 0)
-					nsidx = SelectNamespace (components [0]);
-				if (components.Length > 1) 
-					typeidx = SelectType (nsidx, components [1]);
-				if (components.Length > 2)
-					SelectMember (nsidx, typeidx, components [2]);
+				CurrentObject = DocModel.ParseReference (lastOpenedNode);
 			}
 			webView.DecidePolicyForNavigation += HandleDecidePolicyForNavigation;
-			NSTimer.CreateRepeatingScheduledTimer (1, CheckContents);
-			ready = true;
+			NSTimer.CreateRepeatingScheduledTimer (1, () => this.CheckContents ());
 		}
 	
 		void HandleDecidePolicyForNavigation (object sender, MonoMac.WebKit.WebNavigationPolicyEventArgs e)
@@ -74,269 +105,67 @@ namespace DocWriter
 			switch (e.OriginalUrl.Scheme){
 			case "ecma":
 				WebView.DecideIgnore (e.DecisionToken);
-				NavigateTo (e.OriginalUrl.AbsoluteString.Substring (7));
+				var url = e.OriginalUrl.AbsoluteString.Substring (7);
+				CurrentObject = DocModel.ParseReference (url);
 				return;
 
 				// This is one of our rendered ecma links, we want to extract the target
 				// from the text, not the href attribute value (since this is not easily
 				// editable, and the text is.
 			case "goto":
-				NavigateTo (RunJS ("document.getElementById ('" + e.OriginalUrl.Host + "').text"));
+				url = RunJS ("getText", e.OriginalUrl.Host);
+				CurrentObject = DocModel.ParseReference (url);
 				break;
 			}
 			WebView.DecideUse (e.DecisionToken);
 		}
 
-		int SelectNamespace (string name)
+		bool SelectItem (DocNode docNode)
 		{
-			for (int n = DocModel.NodeCount, i = 0; i < n; i++) {
-				if (DocModel [i].CName == name) {
-					outline.SelectRow (i, false);
-					outline.ScrollRowToVisible (i);
-					return i;
-				}
-			}
-			return 0;
-		}
+			var docN = docNode as DocNamespace;
+			if (docN != null) {
+				outline.ExpandItem (docN);
 
-		int SelectType (int nsidx, string type)
-		{
-			DocNamespace ns = DocModel [nsidx];
-			outline.ExpandItem (ns);
-			for (int n = ns.NodeCount, i = 0; i < n; i++){
-				if (ns [i].CName == type) {
-					var r = outline.RowForItem (ns [i]);
-					outline.SelectRow (r, false);
-					outline.ScrollRowToVisible (r);
-					return i;
-				}
-			}
-			return 0;
-		}
+				var row = outline.RowForItem (docN);
+				outline.SelectRow (row, false);
+				outline.ScrollRowToVisible (row);
 
-		void SelectMember (int nsidx, int typeidx, string name)
-		{
-			DocType type = DocModel [nsidx][typeidx];
-			outline.ExpandItem (type);
-			for (int n = type.NodeCount, i = 0; i < n; i++){
-				if (type [i].CName == name) {
-					var r = outline.RowForItem (type [i]);
-					outline.SelectRow (r, false);
-					outline.ScrollRowToVisible (r);
-					return;
-				}
-			}
-		}
-
-		void SplitType (string rest, out string ns, out string type)
-		{
-			var p = rest.LastIndexOf ('.');
-			if (p == -1) {
-				ns = "";
-				type = rest;
-			} else {
-				ns = rest.Substring (0, p);
-				type = rest.Substring (p + 1);
-			}
-		}
-
-		void SplitMember (string rest, out string ns, out string type, out string method, bool search_open_parens = false)
-		{
-			int l = rest.Length-1;
-
-			// Look for M:System.Console.WriteLine(object)?
-			if (search_open_parens) {
-				var p = rest.IndexOf ('(');
-				if (p != -1)
-					l = p;
-			}
-			int pp = rest.LastIndexOf ('.', l);
-			SplitType (rest.Substring (0, pp), out ns, out type);
-			method = rest.Substring (pp + 1);
-		}
-
-		// This is not currently very precise, for now, it is just a convenience function, later we need to enforce method call parameters
-		public bool NavigateTo (string url)
-		{
-			if (url.Length < 3)
-				return false;
-			if (url [1] != ':')
-				return false;
-			var rest = url.Substring (2);
-			string ns, type, member;
-	
-			switch (url [0]) {
-			case 'N':
-				SelectNamespace (rest);
-				return true;
-			case 'T': 
-				SplitType (rest, out ns, out type);
-				var idx = SelectNamespace (ns);
-				SelectType (idx, type);
-				return true;
-			case 'M':
-			case 'P':
-			case 'E':
-				SplitMember (rest, out ns, out type, out member, search_open_parens: true);
-				idx = SelectNamespace (ns);
-				var tidx = SelectType (idx, type);
-				SelectMember (idx, tidx, member);
-				return true;
-			case 'F':
-				SplitMember (rest, out ns, out type, out member);
-				idx = SelectNamespace (ns);
-				SelectType (idx, type);
 				return true;
 			}
+			
+			var docT = docNode as DocType;
+			if (docT != null) {
+				outline.ExpandItem (docT.Namespace);
+				outline.ExpandItem (docT);
+
+				var row = outline.RowForItem (docT);
+				outline.SelectRow (row, false);
+				outline.ScrollRowToVisible (row);
+
+				return true;
+			}
+
+			var docM = docNode as DocMember;
+			if (docM != null) {
+				outline.ExpandItem (docM.Type.Namespace);
+				outline.ExpandItem (docM.Type);
+				outline.ExpandItem (docM);
+
+				var row = outline.RowForItem (docM);
+				outline.SelectRow (row, false);
+				outline.ScrollRowToVisible (row);
+
+				return true;
+			}
+
 			return false;
 		}
 
-		public string RunJS (string code)
+		[Export("outlineViewSelectionDidChange:")]
+		void SelectionDidChange (NSNotification notification)
 		{
-			return webView.StringByEvaluatingJavaScriptFromString (code);
-		}
-
-		public string Fetch (string id)
-		{
-			var element = RunJS ("getHtml(\"" + id + "\")");
-			if (element.StartsWith ("<<<<")) {
-				Console.WriteLine ("Failure to fetch contents of {0}", id);
-			}
-			return element;
-		}
-
-		NSObject currentObject;
-
-		void CheckContents ()
-		{
-			var dirtyNodes = RunJS ("getDirtyNodes ()").Split (new char [] {' '}, StringSplitOptions.RemoveEmptyEntries);
-			if (dirtyNodes.Length == 0)
-				return;
-
-			if (currentObject != null && currentObject is IEditableNode) {
-				string result;
-
-				try {
-					result = (currentObject as IEditableNode).ValidateChanges (this, dirtyNodes);
-				} catch (Exception e){
-					result = e.ToString ();
-				}
-
-				if (result != null)
-					statusLabel.Cell.StringValue = result;
-				else
-					statusLabel.Cell.StringValue = "OK";
-			}
-		}
-
-		public void SaveCurrentObject ()
-		{
-			if (!ready)
-				return;
-			
-			var editable = currentObject as IEditableNode;
-			if (editable != null) {
-				string error;
-
-				CheckContents ();
-
-				if (!editable.Save (this, out error)) {
-					// FIXME: popup a window or something.
-				}
-			}
-		}
-
-		// Suggests a name for the reference based on the current context
-		public string SuggestTypeRef ()
-		{
-			var cns = currentObject as DocNamespace;
-			if (cns != null)
-				return cns.Name;
-			var ctype = currentObject as DocType;
-			if (ctype != null)
-				return ctype.Namespace.Name + "." + ctype.Name;
-			var cm = currentObject as DocMember;
-			if (cm != null)
-				return cm.Type.Namespace.Name + "." + cm.Type.Name;
-			return "MonoTouch.";
-		}
-
-		void SelectionChanged ()
-		{
-			SaveCurrentObject ();
-			currentObject = null;
-
-			currentObject = outline.ItemAtRow (outline.SelectedRow);
-			var docNode = currentObject as DocNode;
-			if (docNode != null) {
-				NSUserDefaults.StandardUserDefaults.SetString (docNode.DocPath, "currentNode"+Path);
-			}
-
-			var ihtml = currentObject as IHtmlRender;
-			if (ihtml == null)
-				return;
-
-			string contents;
-			try {
-				contents = ihtml.Render ();
-			} catch (Exception e){
-				contents = String.Format ("<body><p>Error Loading the contents for the new node<p>Exception:<p><pre>{0}</pre>", System.Web.HttpUtility.HtmlEncode (e.ToString ()));
-			}
-			webView.MainFrame.LoadHtmlString (contents, NSBundle.MainBundle.ResourceUrl);
-		}
-
-		static string EscapeHtml (string html)
-		{
-			var sb = new StringBuilder ();
-
-			foreach (char c in html) {
-				if (c == '\n')
-					sb.Append ("\\\n");
-				else
-					sb.Append (c);
-			}
-			return sb.ToString ();
-		}
-
-		public void InsertSpan (string html)
-		{
-			webView.StringByEvaluatingJavaScriptFromString ("insertSpanAtCursor(\"" + EscapeHtml (html) + "\")");
-		}
-
-		//
-		// Turns the provided ECMA XML node into HTML and appends it to the current node on the
-		// rendered HTML.
-		//
-		public void AppendNode (XElement ecmaXml)
-		{
-			DocNode docNode = currentObject as DocNode;
-			if (docNode != null) {
-				var html = DocConverter.ToHtml (ecmaXml, "", docNode.DocumentDirectory);
-				webView.StringByEvaluatingJavaScriptFromString ("insertHtmlAfterCurrentNode(\"" + EscapeHtml (html) + "\")");
-			}
-		}
-
-		public string CurrentNodePath {
-			get {
-				DocNode docNode = currentObject as DocNode;
-				if (docNode == null)
-					return null;
-				return docNode.DocumentDirectory;
-			}
-		}
-
-		class DocumentTreeDelegate : NSOutlineViewDelegate {
-			MainWindow win;
-
-			public DocumentTreeDelegate (MainWindow win)
-			{
-				this.win = win;
-			}
-
-			public override void SelectionDidChange (NSNotification notification)
-			{
-				win.SelectionChanged ();
-			}
+			var outlineView = (NSOutlineView) notification.Object;
+			CurrentObject = (DocNode) outlineView.ItemAtRow (outlineView.SelectedRow);
 		}
 	}
 
@@ -388,8 +217,10 @@ namespace DocWriter
 
 		public override NSObject GetObjectValue (NSOutlineView outlineView, NSTableColumn tableColumn, NSObject item)
 		{
+			if (item is DocMember)
+				return (NSString) ($"{(item as DocMember).Name} ({string.Join(", ", (item as DocMember).MemberParams.Select(p => p.Attribute("Type").Value))})");
 			if (item is DocNode)
-				return (item as DocNode).Name;
+				return (NSString) (item as DocNode).Name;
 			return new NSString ("Should not happen");
 		}
 	}

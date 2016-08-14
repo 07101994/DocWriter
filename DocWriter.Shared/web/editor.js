@@ -9,7 +9,6 @@ function track(element)
     var edit = $(element).closest (".edit");
 	if (edit.length > 0){
 	    dirty [edit [0].id] = edit [0].id;
-	    console.log ("Dirty: " + edit [0].id);
     }
 }
 
@@ -103,20 +102,30 @@ function getHtml(xid)
     return element.innerHTML;
 }
 
+function getText(xid)
+{
+    if (document == null)
+    	return "<>Odd";
+    element = document.getElementById (xid);
+	if (element === null)
+		return "<<<<It is null and id=" + xid;
+
+    return element.text;
+}
+
 // Tracks changes on a content editable node whose name is 'node'
 // and stores the id of the node on chages in the dirty dictionary
 function trackDirty (node)
 {
     var domNode = document.getElementById (node);
-    domNode.addEventListener ("input", function () {
+    $(domNode).bind("input keyup cut paste blur", function () {
 	    dirty [domNode.id] = domNode.id;
 	    if ($(domNode).html () == "To be added."){
 	    	$(domNode).addClass ("to-be-added");
 	    } else {
 			$(domNode).removeClass ("to-be-added");
 		}
-        console.log ("Logging dirty " + domNode.id);
-    }, false);
+    });
 }
 
 function inTable ()
@@ -147,7 +156,6 @@ function moveCursorTo (node,event)
 
 function keypressHandler (event)
 {
-    console.log (event.which)
     ee = event;
 
     //

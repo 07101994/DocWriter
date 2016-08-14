@@ -1,0 +1,106 @@
+﻿<Window x:Class="DocWriter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DocWriter"
+        mc:Ignorable="d"
+        Title="DocWriter"
+        Loaded="Window_Loaded" ResizeMode="CanResizeWithGrip" Closing="Window_Closing">
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" />
+                <MenuItem Header="_Open..." Click="OpenMenuItem_Click"/>
+                <Separator />
+                <MenuItem Header="_Close" />
+                <Separator />
+                <MenuItem Header="_Save" Click="SaveMenuItem_Click" />
+                <Separator />
+                <MenuItem Header="Page Set_up..."/>
+                <MenuItem Header="_Print..." />
+                <Separator />
+                <MenuItem Header="E_xit" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo" />
+                <MenuItem Header="_Redo" />
+                <Separator />
+                <MenuItem Header="Cu_t" />
+                <MenuItem Header="_Copy" />
+                <MenuItem Header="_Paste" />
+                <MenuItem Header="_Delete" />
+                <Separator />
+                <MenuItem Header="Select _All" />
+            </MenuItem>
+            <MenuItem Header="_Insert">
+                <MenuItem Header="_Code">
+                    <MenuItem Header="C# Example" />
+                    <MenuItem Header="C# Code Block" />
+                    <Separator />
+                    <MenuItem Header="F# Example" />
+                    <MenuItem Header="F# Code Block" />
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Reference" Click="InsertReferenceMenuItem_Click" />
+                <MenuItem Header="URL" Click="InsertUrlMenuItem_Click" />
+                <MenuItem Header="List" />
+                <MenuItem Header="Table" />
+                <MenuItem Header="Image" />
+                <Separator />
+                <MenuItem Header="HTML H2" />
+            </MenuItem>
+            <MenuItem Header="_Format">
+                <MenuItem Header="Selection to ParamRef" />
+                <MenuItem Header="Selection to TypeRef" />
+                <MenuItem Header="Selection to LangWord" />
+                <Separator />
+                <MenuItem Header="Align Left" />
+                <MenuItem Header="Align Center" />
+                <MenuItem Header="Align Right" />
+                <MenuItem Header="Justify" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="View Help" />
+                <Separator />
+                <MenuItem Header="About DocWriter" />
+            </MenuItem>
+        </Menu>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem x:Name="statusLabel" Content="Welcome to DocWriter..." />
+        </StatusBar>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" MinWidth="120" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <TreeView x:Name="outline" Grid.Column="0" SelectedItemChanged="outline_SelectedItemChanged">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type local:DocModel}" ItemsSource="{Binding Namespaces}">
+                        <TextBlock Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type local:DocNamespace}" ItemsSource="{Binding Types}">
+                        <TextBlock Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type local:DocType}" ItemsSource="{Binding Members}">
+                        <TextBlock Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type local:DocMember}">
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+
+            <GridSplitter Width="6" VerticalAlignment="Stretch" Grid.Column="1" HorizontalAlignment="Center" />
+
+            <WebBrowser x:Name="webView" Grid.Column="2" Navigating="webView_Navigating" />
+
+        </Grid>
+
+    </DockPanel>
+
+</Window>

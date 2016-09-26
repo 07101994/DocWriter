@@ -12,6 +12,7 @@ namespace DocWriter
 		{
 			NSApplication.Init ();
 			NSApplication.Main (args);
+
 		}
 	}
 }

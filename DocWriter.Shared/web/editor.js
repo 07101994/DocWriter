@@ -18,7 +18,7 @@ function track(element)
 function insertSpanAtCursor(html)
 {
 	sel = window.getSelection ();
-    if (sel.type == "Caret") {    	
+    if (sel.focusOffset == sel.anchorOffset) {    	
         range = sel.getRangeAt(0);
         range.deleteContents();
 	    newfrag = range.createContextualFragment (html);
@@ -39,7 +39,7 @@ function insertSpanAtCursor(html)
 function selectionToCode(cname)
 {
 	sel = window.getSelection ();
-    if (sel.type == "Range") {    	
+    if (sel.focusOffset != sel.anchorOffset) {    	
         range = sel.getRangeAt(0);
 	    var c = document.createElement ("code");
 		$(c).addClass (cname);
@@ -73,7 +73,7 @@ function editableNode (jnode)
 function insertHtmlAfterCurrentNode (html)
 {
 	sel = window.getSelection ()
-    if (sel.type == "Caret"	) {
+    if (sel.focusOffset == sel.anchorOffset) {
     	
     	if (editableNode ($(sel.focusNode)))
     	   appendon = sel.focusNode;

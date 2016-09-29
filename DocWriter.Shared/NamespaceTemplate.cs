@@ -32,7 +32,7 @@ public DocNamespace Model { get; set; }
 
 public override void Execute()
 {
-WriteLiteral("<html>\n<head>\n  <script");
+WriteLiteral("<html>\n<head>\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />\n  <script");
 
 WriteLiteral(" type=\"text/javascript\"");
 

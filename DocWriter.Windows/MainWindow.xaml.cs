@@ -53,11 +53,6 @@ namespace DocWriter
 
                     currentObject = value;
 
-                    if (currentObject != null)
-                    {
-                        // TODO: [Settings] save the last open node
-                    }
-
                     SelectItem(currentObject);
 
                     var ihtml = currentObject as IHtmlRender;
@@ -86,11 +81,23 @@ namespace DocWriter
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // TODO: [Settings] load the last selected directory
+            // load the last opened docs
+            var lastPath = Settings.Default.LastUsedPath;
+            if (Directory.Exists(lastPath) && File.Exists(Path.Combine(lastPath, "index.xml")))
+            {
+                OpenDirectory(lastPath);
+            }
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            // save last selected node
+            if (CurrentObject != null)
+            {
+                Settings.Default.LastExpandedNode = CurrentObject.ReferenceString;
+                Settings.Default.Save();
+            }
+
             CurrentObject = null;
         }
 
@@ -107,7 +114,9 @@ namespace DocWriter
                 var docsDir = Path.Combine(openDialog.SelectedPath, "en");
                 if (Directory.Exists(docsDir) && File.Exists(Path.Combine(docsDir, "index.xml")))
                 {
-                    // TODO: [Settings] save the last selected directory
+                    // save the last opened docs
+                    Settings.Default.LastUsedPath = docsDir;
+                    Settings.Default.Save();
 
                     OpenDirectory(docsDir);
                 }
@@ -131,7 +140,8 @@ namespace DocWriter
             outline.ItemsSource = DocModel.Namespaces;
             Title = "DocWriter - " + WindowPath;
 
-            // TODO: [Settings] restore the last open node
+            // restore the last open node
+            CurrentObject = DocModel.ParseReference(Settings.Default.LastExpandedNode);
         }
 
         private bool SelectItem(DocNode newNode)

@@ -22,5 +22,29 @@ namespace DocWriter.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastUsedPath {
+            get {
+                return ((string)(this["LastUsedPath"]));
+            }
+            set {
+                this["LastUsedPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastExpandedNode {
+            get {
+                return ((string)(this["LastExpandedNode"]));
+            }
+            set {
+                this["LastExpandedNode"] = value;
+            }
+        }
     }
 }

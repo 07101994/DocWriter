@@ -16,32 +16,13 @@
       <Link>DocConverter.cs</Link>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)DocModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)MemberTemplate.cs">
-      <DependentUpon>MemberTemplate.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)NamespaceTemplate.cs">
-      <DependentUpon>NamespaceTemplate.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)TypeTemplate.cs">
-      <DependentUpon>TypeTemplate.cshtml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)EmbeddedResourceReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EditorWindow.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MemberTemplate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NamespaceTemplate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TemplateBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeTemplate.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebView.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)MemberTemplate.cshtml">
-      <Generator>RazorTemplatePreprocessor</Generator>
-      <LastGenOutput>MemberTemplate.cs</LastGenOutput>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)NamespaceTemplate.cshtml">
-      <Generator>RazorTemplatePreprocessor</Generator>
-      <LastGenOutput>NamespaceTemplate.cs</LastGenOutput>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)TypeTemplate.cshtml">
-      <Generator>RazorTemplatePreprocessor</Generator>
-      <LastGenOutput>TypeTemplate.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)web\editor.js" />

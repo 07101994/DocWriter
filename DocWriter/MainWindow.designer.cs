@@ -4,7 +4,7 @@
 // actions made in the UI designer. If it is removed, they will be lost.
 // Manual changes to this file may not be handled correctly.
 //
-using MonoMac.Foundation;
+using Foundation;
 using System.CodeDom.Compiler;
 
 namespace DocWriter
@@ -13,16 +13,16 @@ namespace DocWriter
 	partial class MainWindow
 	{
 		[Outlet]
-		MonoMac.AppKit.NSTextField lookupEntry { get; set; }
+		AppKit.NSTextField lookupEntry { get; set; }
 
 		[Outlet]
-		MonoMac.AppKit.NSOutlineView outline { get; set; }
+		AppKit.NSOutlineView outline { get; set; }
 
 		[Outlet]
-		MonoMac.AppKit.NSTextField statusLabel { get; set; }
+		AppKit.NSTextField statusLabel { get; set; }
 
 		[Outlet]
-		MonoMac.WebKit.WebView webView { get; set; }
+		WebKit.WebView webView { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{

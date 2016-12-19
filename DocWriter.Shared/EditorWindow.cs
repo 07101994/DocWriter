@@ -1,5 +1,5 @@
-﻿//
-// EditprWindow.cs: Contains the the interface and logic for editing the docs
+//
+// EditorWindow.cs: Contains the the interface and logic for editing the docs
 //
 // Author:
 //   Miguel de Icaza (miguel@xamarin.com)
@@ -18,7 +18,7 @@ using System.Text;
 using System.Web;
 
 #if __XAMARIN_MAC__
-using NSObject = MonoMac.Foundation.NSObject;
+using NSObject = Foundation.NSObject;
 #else
 using NSObject = System.Object;
 #endif

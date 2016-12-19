@@ -10,13 +10,14 @@
 //
 using System;
 using System.Linq;
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.WebKit;
+
+using AppKit;
+using Foundation;
+using WebKit;
 
 namespace DocWriter
 {
-	public partial class MainWindow : MonoMac.AppKit.NSWindow, INSOutlineViewDelegate, IEditorWindow
+	public partial class MainWindow : NSWindow, INSOutlineViewDelegate, IEditorWindow
 	{
 		// Called when created from unmanaged code
 		public MainWindow (IntPtr handle) : base (handle)
@@ -97,10 +98,10 @@ namespace DocWriter
 				CurrentObject = DocModel.ParseReference (lastOpenedNode);
 			}
 			webView.DecidePolicyForNavigation += HandleDecidePolicyForNavigation;
-			NSTimer.CreateRepeatingScheduledTimer (1, () => this.CheckContents ());
+			NSTimer.CreateRepeatingScheduledTimer (1, timer => this.CheckContents ());
 		}
 	
-		void HandleDecidePolicyForNavigation (object sender, MonoMac.WebKit.WebNavigationPolicyEventArgs e)
+		void HandleDecidePolicyForNavigation (object sender, WebNavigationPolicyEventArgs e)
 		{
 			switch (e.OriginalUrl.Scheme){
 			case "ecma":
@@ -177,7 +178,7 @@ namespace DocWriter
 			this.docModel = docModel;
 		}
 
-		public override int GetChildrenCount (NSOutlineView outlineView, NSObject item)
+		public override nint GetChildrenCount (NSOutlineView outlineView, NSObject item)
 		{
 			if (item == null)
 				return docModel.NodeCount;
@@ -198,19 +199,19 @@ namespace DocWriter
 			return false;
 		}
 
-		public override NSObject GetChild (NSOutlineView outlineView, int childIndex, NSObject item)
+		public override NSObject GetChild (NSOutlineView outlineView, nint childIndex, NSObject item)
 		{
 
 			if (item == null) 
-				return docModel [childIndex];
+				return docModel [(int)childIndex];
 
 			if (item is DocNamespace) {
 				var ds = item as DocNamespace;
-				return ds [childIndex];
+				return ds [(int)childIndex];
 			}
 			if (item is DocType) {
 				var dt = item as DocType;
-				return dt [childIndex];
+				return dt [(int)childIndex];
 			}
 			return null;
 		}

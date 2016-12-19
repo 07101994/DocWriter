@@ -4,7 +4,7 @@
 // actions made in the UI designer. If it is removed, they will be lost.
 // Manual changes to this file may not be handled correctly.
 //
-using MonoMac.Foundation;
+using Foundation;
 using System.CodeDom.Compiler;
 
 namespace DocWriter
@@ -13,16 +13,16 @@ namespace DocWriter
 	partial class MemberEntry
 	{
 		[Outlet]
-		MonoMac.AppKit.NSTableView tableView { get; set; }
+		AppKit.NSTableView tableView { get; set; }
 
 		[Outlet]
-		MonoMac.AppKit.NSTextField textField { get; set; }
+		AppKit.NSTextField textField { get; set; }
 
 		[Action ("cancel:")]
-		partial void cancel (MonoMac.Foundation.NSObject sender);
+		partial void cancel (Foundation.NSObject sender);
 
 		[Action ("ok:")]
-		partial void ok (MonoMac.Foundation.NSObject sender);
+		partial void ok (Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{

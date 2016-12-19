@@ -1,12 +1,9 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using MonoMac.ObjCRuntime;
-using System.Xml.Linq;
 using System.Linq;
 using System.IO;
+
+using AppKit;
+using Foundation;
 
 namespace DocWriter
 {
@@ -14,11 +11,7 @@ namespace DocWriter
 	{
 		List<MainWindowController> windows = new List<MainWindowController> ();
 
-		public AppDelegate ()
-		{
-		}
-
-		public override void FinishedLaunching (NSObject notification)
+		public override void DidFinishLaunching (NSNotification notification)
 		{
 			NSUserDefaults.StandardUserDefaults.SetBool (true, "WebKitDeveloperExtras");
 			NSUserDefaults.StandardUserDefaults.Synchronize ();

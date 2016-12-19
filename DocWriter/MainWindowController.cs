@@ -1,4 +1,4 @@
-﻿//
+//
 // MainWindowController.cs: contains the handling of the main shell.
 //
 // Author:
@@ -9,16 +9,15 @@
 //
 //
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using MonoMac.Foundation;
-using MonoMac.AppKit;
-using System.Xml.Linq;
 using System.IO;
+
+using AppKit;
+using Foundation;
 
 namespace DocWriter
 {
-	public partial class MainWindowController : MonoMac.AppKit.NSWindowController
+	public partial class MainWindowController : AppKit.NSWindowController
 	{
 		public string WindowPath { get; private set; }
 		

@@ -4,7 +4,7 @@
 // actions made in the UI designer. If it is removed, they will be lost.
 // Manual changes to this file may not be handled correctly.
 //
-using MonoMac.Foundation;
+using Foundation;
 using System.CodeDom.Compiler;
 
 namespace DocWriter
@@ -13,10 +13,10 @@ namespace DocWriter
 	partial class InsertUrlController
 	{
 		[Action ("cancel:")]
-		partial void cancel (MonoMac.Foundation.NSObject sender);
+		partial void cancel (Foundation.NSObject sender);
 
 		[Action ("ok:")]
-		partial void ok (MonoMac.Foundation.NSObject sender);
+		partial void ok (Foundation.NSObject sender);
 		
 		void ReleaseDesignerOutlets ()
 		{
@@ -27,10 +27,10 @@ namespace DocWriter
 	partial class InsertUrl
 	{
 		[Outlet]
-		MonoMac.AppKit.NSTextField caption { get; set; }
+		AppKit.NSTextField caption { get; set; }
 
 		[Outlet]
-		MonoMac.AppKit.NSTextField targetUrl { get; set; }
+		AppKit.NSTextField targetUrl { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{

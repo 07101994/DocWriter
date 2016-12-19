@@ -1,4 +1,4 @@
-﻿//
+//
 // DocModel.cs: Contains the various nodes that know how to render and edit pages
 //
 // Author:
@@ -18,7 +18,7 @@ using System.Text;
 using System.Web;
 
 #if __XAMARIN_MAC__
-using NSObject = MonoMac.Foundation.NSObject;
+using NSObject = Foundation.NSObject;
 #else
 using NSObject = System.Object;
 #endif

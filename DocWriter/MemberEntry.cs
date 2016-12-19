@@ -9,13 +9,13 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using MonoMac.Foundation;
-using MonoMac.AppKit;
+
+using AppKit;
+using Foundation;
 
 namespace DocWriter
 {
-	public partial class MemberEntry : MonoMac.AppKit.NSWindow
+	public partial class MemberEntry : NSWindow
 	{
 		DocModel docModel;
 		MainWindowController mainWindowController;
@@ -174,14 +174,14 @@ namespace DocWriter
 				this.me = me;
 			}
 
-			public override int GetRowCount (NSTableView tableView)
+			public override nint GetRowCount (NSTableView tableView)
 			{
 				return (me.results.Count);
 			}
 
-			public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn tableColumn, int row)
+			public override NSObject GetObjectValue (NSTableView tableView, NSTableColumn tableColumn, nint row)
 			{
-				return (NSString) me.results [row].Name;
+				return (NSString) me.results [(int)row].Name;
 			}
 		}
 	}

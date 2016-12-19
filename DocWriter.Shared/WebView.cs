@@ -1,4 +1,4 @@
-﻿//
+//
 // WebView.cs: Contains the interface and logic for working with a Web view
 //
 // Author:
@@ -18,7 +18,7 @@ using System.Text;
 using System.Web;
 
 #if __XAMARIN_MAC__
-using NSObject = MonoMac.Foundation.NSObject;
+using NSObject = Foundation.NSObject;
 #else
 using NSObject = System.Object;
 #endif

@@ -347,9 +347,11 @@ namespace DocWriter
 				Root = doc.Root;
 				xml_members = doc.XPathSelectElements ("/Type/Members/Member").ToArray ();
 				Params = doc.XPathSelectElements ("/Type/Docs/param");
-				members = new DocMember[xml_members.Length];
+				members = new DocMember [xml_members.Length];
 			} catch {
 			}
+			if (doc == null)
+				throw new ArgumentException ("Could not load document " + path);
 		}
 
 		public string FullName {

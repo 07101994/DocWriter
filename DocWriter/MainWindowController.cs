@@ -82,6 +82,11 @@ namespace DocWriter
 				return;
 			var nodeImageDir = Path.Combine (nodePath, "_images");
 
+			try {
+				if (!Directory.Exists (nodeImageDir))
+					Directory.CreateDirectory (nodeImageDir);
+			} catch { }
+
 			var dlg = NSOpenPanel.OpenPanel;
 			dlg.CanChooseFiles = true;
 			dlg.CanChooseDirectories = false;
@@ -96,6 +101,8 @@ namespace DocWriter
 
 			var path = dlg.Urls.FirstOrDefault ().Path;
 			var target = Path.Combine (nodeImageDir, Path.GetFileName (path));
+
+
 
 			if (File.Exists (target)) {
 				var alert = new NSAlert () {

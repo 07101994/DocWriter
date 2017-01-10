@@ -662,11 +662,16 @@ class EcmaToXml {
 	// Renders <format>..</format>
 	string RenderFormat (XElement el)
 	{
-		var kind = el.Attribute ("type").Value;
-		if (kind == "text/html") {
-			return string.Format ("<div class='verbatim'>{0}</div>", Verbatim (el.Nodes ()));
-		} else
-			throw new UnsupportedElementException ("Do not support anything but <format type='text/html'>");
+		try {
+			var kind = el.Attribute ("type")?.Value;
+			if (kind == "text/html" || kind == null) {
+				return string.Format ("<div class='verbatim'>{0}</div>", Verbatim (el.Nodes ()));
+			} else
+				throw new UnsupportedElementException ("Do not support anything but <format type='text/html'>");
+		} catch {
+			Console.WriteLine ("here");
+			return null;
+		}
 	}
 
 	// Renders <example>...</example>

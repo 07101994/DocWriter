@@ -1,4 +1,4 @@
-﻿﻿//
+//
 // DocConverter.cs: Routines to turn ECMA XML into an HTML string and this subset of HTML back into ECMA XML
 //
 // Author:
@@ -741,7 +741,7 @@ class EcmaToXml {
 				} else if (flattenNestedParas && xel.Name == "para")
 				{
 					//Only allow 1 level of nesting, since use-case is <para> as node under, e.g., <example>
-					RenderPara(xel.Nodes(), false);
+					sb.Append(RenderPara(xel.Nodes(), false));
 				} else {
 					Console.WriteLine ("File: {0}, Node: {1}", currentFile, node);
 					throw new UnsupportedElementException ("Unsupported element in RenderPara: " + xel.Name);

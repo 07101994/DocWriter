@@ -1,4 +1,4 @@
-﻿//
+﻿﻿//
 // DocConverter.cs: Routines to turn ECMA XML into an HTML string and this subset of HTML back into ECMA XML
 //
 // Author:
@@ -677,7 +677,8 @@ class EcmaToXml {
 	// Renders <example>...</example>
 	string RenderExample (XElement el)
 	{
-		return string.Format ("<div class='example'><div class='skip example-title' contenteditable='false'>Example</div><div class='example-body'>{0}</div></div>", RenderPara (el.Nodes ()));
+		//Note that this calls RenderPara with "flattenParas" == true. <para/> is valid child of <example>. 
+		return string.Format ("<div class='example'><div class='skip example-title' contenteditable='false'>Example</div><div class='example-body'>{0}</div></div>", RenderPara (el.Nodes (), true));
 	}
 
 	string RenderBlock (XElement el)
@@ -694,7 +695,7 @@ class EcmaToXml {
 	}
 
 	// Renders <para>...</para>
-	string RenderPara (IEnumerable<XNode> nodes)
+	string RenderPara (IEnumerable<XNode> nodes, Boolean flattenNestedParas = false)
 	{
 		var sb = new StringBuilder ();
 		foreach (var node in nodes) {
@@ -702,24 +703,45 @@ class EcmaToXml {
 				sb.Append (HttpUtility.HtmlEncode ((node as XText).Value));
 			else if (node is XElement) {
 				var xel = node as XElement;
-				if (xel.Name == "see") {
-					sb.Append (RenderSee (xel));
-				} else if (xel.Name == "img") {
-					sb.Append (RenderImage (xel));
-				} else if (xel.Name == "c") {
-					sb.Append (RenderC (xel));
-				} else if (xel.Name == "format") {
-					sb.Append (RenderFormat (xel));
-				} else if (xel.Name == "list") {
-					sb.AppendFormat ("{0}", RenderList (xel));
-				} else if (xel.Name == "paramref") {
-					sb.Append (RenderParamRef (xel));
-				} else if (xel.Name == "typeparamref") {
-					sb.Append (RenderTypeParamRef (xel));
-				} else if (xel.Name == "example") {
-					Console.WriteLine ("Warning: <example> node inside a <para>, move out {0}", currentFile);
-				} else if (xel.Name == "code") {
-					sb.Append (RenderCode (xel));
+				if (xel.Name == "see")
+				{
+					sb.Append(RenderSee(xel));
+				}
+				else if (xel.Name == "img")
+				{
+					sb.Append(RenderImage(xel));
+				}
+				else if (xel.Name == "c")
+				{
+					sb.Append(RenderC(xel));
+				}
+				else if (xel.Name == "format")
+				{
+					sb.Append(RenderFormat(xel));
+				}
+				else if (xel.Name == "list")
+				{
+					sb.AppendFormat("{0}", RenderList(xel));
+				}
+				else if (xel.Name == "paramref")
+				{
+					sb.Append(RenderParamRef(xel));
+				}
+				else if (xel.Name == "typeparamref")
+				{
+					sb.Append(RenderTypeParamRef(xel));
+				}
+				else if (xel.Name == "example")
+				{
+					Console.WriteLine("Warning: <example> node inside a <para>, move out {0}", currentFile);
+				}
+				else if (xel.Name == "code")
+				{
+					sb.Append(RenderCode(xel));
+				} else if (flattenNestedParas && xel.Name == "para")
+				{
+					//Only allow 1 level of nesting, since use-case is <para> as node under, e.g., <example>
+					RenderPara(xel.Nodes(), false);
 				} else {
 					Console.WriteLine ("File: {0}, Node: {1}", currentFile, node);
 					throw new UnsupportedElementException ("Unsupported element in RenderPara: " + xel.Name);
